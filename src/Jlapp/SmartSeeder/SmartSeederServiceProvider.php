@@ -31,7 +31,18 @@ class SmartSeederServiceProvider extends ServiceProvider {
         );
 
         App::bindShared('seed.repository', function($app) {
-            return new SmartSeederRepository($app['db'], config('smart-seeder.seedTable'));
+            return new SmartSeederRepository(
+                $app['db'],
+                config('smart-seeder.seedTable') // for seeder table
+            );
+        });
+
+        // For creating the seed_file table.
+        App::bindShared('seed.repository_files', function($app) {
+            return new SmartSeederFilesRepository(
+                $app['db'],
+                config('smart-seeder.seedFileTable') // for seeder files table;
+            );
         });
 
         App::bindShared('seed.migrator', function($app)
@@ -51,7 +62,10 @@ class SmartSeederServiceProvider extends ServiceProvider {
 
         $this->app->bind('seed.install', function($app)
         {
-            return new SeedInstallCommand($app['seed.repository']);
+            return new SeedInstallCommand(
+                $app['seed.repository'],
+                $app['seed.repository_files']
+            );
         });
 
         $this->app->bind('seed.make', function()
@@ -74,8 +88,21 @@ class SmartSeederServiceProvider extends ServiceProvider {
             return new SeedRefreshCommand();
         });
 
+
+
+        App::bindShared('seed.migrator_file', function($app)
+        {
+            return new SeedFileMigrator($app['seed.repository'], $app['db'], $app['files']);
+        });
+
+        $this->app->bind('seed.run_client', function($app)
+        {
+            return new SeedClientCommand($app['seed.migrator_file']);
+        });
+
         $this->commands([
             'seed.run',
+            'seed.run_client',
             'seed.install',
             'seed.make',
             'seed.reset',
@@ -101,6 +128,10 @@ class SmartSeederServiceProvider extends ServiceProvider {
             'seed.reset',
             'seed.rollback',
             'seed.refresh',
+
+            'seed.repository_files',
+            'seed.migrator_file',
+            'seed.run_client',
         ];
     }
 

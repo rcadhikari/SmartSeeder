@@ -5,7 +5,7 @@ use Illuminate\Database\Migrations\MigrationRepositoryInterface;
 use Illuminate\Database\Schema\Blueprint;
 use App;
 
-class SmartSeederRepository implements MigrationRepositoryInterface {
+class SmartSeederFilesRepository implements MigrationRepositoryInterface {
 
     /**
      * The database connection resolver instance.
@@ -86,7 +86,7 @@ class SmartSeederRepository implements MigrationRepositoryInterface {
 
         $query = $this->table()->where(self::envVar, '=', $env)->where('batch', $this->getLastBatchNumber());
 
-        return $query->orderBy('seed', 'desc')->get();
+        return $query->orderBy('file', 'desc')->get();
     }
 
     /**
@@ -102,7 +102,12 @@ class SmartSeederRepository implements MigrationRepositoryInterface {
         if (empty($env)) {
             $env = App::environment();
         }
-        $record = array('seed' => $file, self::envVar => $env, 'batch' => $batch);
+        $record = array(
+            'file' => $file,
+            self::envVar => $env,
+            'batch' => $batch,
+            'created_at' => date('Y-m-d H:i:s')
+        );
 
         $this->table()->insert($record);
     }
@@ -165,9 +170,10 @@ class SmartSeederRepository implements MigrationRepositoryInterface {
             // The migrations table is responsible for keeping track of which of the
             // migrations have actually run for the application. We'll create the
             // table to hold the migration file's path as well as the batch ID.
-            $table->string('seed');
+            $table->string('file');
             $table->string('client');
             $table->integer('batch');
+            $table->timestamp('created_at');
         });
 
         return true;

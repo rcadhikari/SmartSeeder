@@ -9,7 +9,7 @@ use Config;
 use File;
 use App;
 
-class SeedMigrator extends Migrator {
+class SeedFileMigrator extends Migrator {
 
     use AppNamespaceDetectorTrait;
 

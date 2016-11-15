@@ -5,18 +5,19 @@ use Illuminate\Auth\UserInterface;
 use Illuminate\Auth\Reminders\RemindableTrait;
 use Illuminate\Auth\Reminders\RemindableInterface;
 
-class Seeder extends Eloquent {
+class SeederFiles extends Eloquent {
 
 	/**
 	 * The database table used by the model.
 	 *
 	 * @var string
 	 */
-	protected $table = 'seeds';
+	protected $table = 'seeds_files';
 
     protected $fillable = [
-        'seed',
+        'file',
         'client', //'env',
-        'batch'
+        'batch',
+        'created_at'
     ];
 }

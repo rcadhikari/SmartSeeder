@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Support\Facades\Config;
 
-class SeedCommand extends Command {
+class SeedClientCommand extends Command {
 
     use ConfirmableTrait;
     /**
@@ -14,7 +14,7 @@ class SeedCommand extends Command {
      *
      * @var string
      */
-    protected $name = 'seed:run';
+    protected $name = 'seed:run_client';
 
     private $migrator;
 
@@ -23,10 +23,10 @@ class SeedCommand extends Command {
      *
      * @var string
      */
-    protected $description = 'Seeds the database';
+    protected $description = 'Seeds the client data files';
 
 
-    public function __construct(SeedMigrator $migrator) {
+    public function __construct(SeedFileMigrator $migrator) {
         parent::__construct();
         $this->migrator = $migrator;
     }
@@ -46,9 +46,18 @@ class SeedCommand extends Command {
         // a database for real, which is helpful for double checking migrations.
         $pretend = $this->input->getOption('pretend');
 
-        $path = database_path(config('smart-seeder.seedDir'));
-        $env = $this->option('client');
+        $path = client_path(config('smart-seeder.seedDir'));
+        $file_path= client_path(config('smart-seeder.seedFileDir'));
+        $client = $this->option('client');
+        $file_path = str_replace('{client}', $client, $file_path);
+        $data_path= $file_path.config('smart-seeder.seedDataFileDir');
 
+        /*echo ($client);
+        echo "\n". $path;
+        echo "\n".$file_path;
+        echo "\n".$data_path; die;*/
+
+        $env = $this->option('client');
         $this->migrator->setEnv($env);
 
         $single = $this->option('file');
