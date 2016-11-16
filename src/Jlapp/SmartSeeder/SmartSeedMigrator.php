@@ -9,9 +9,11 @@ use Config;
 use File;
 use App;
 
-class SeedFileMigrator extends Migrator {
+class SmartSeedMigrator extends Migrator {
 
     use AppNamespaceDetectorTrait;
+
+    protected $client;
 
     /**
      * Create a new migrator instance.
@@ -32,6 +34,16 @@ class SeedFileMigrator extends Migrator {
         $this->repository->setEnv($env);
     }
 
+    public function setClient($client)
+    {
+        $this->client = $client;
+    }
+
+    public function getClient()
+    {
+        return $this->client;
+    }
+
     /**
      * Get all of the migration files in a given path.
      *
@@ -40,6 +52,8 @@ class SeedFileMigrator extends Migrator {
      */
     public function getMigrationFiles($path)
     {
+        $data_path= $path.config('smart-seeder.seedDataFileDir');
+
         $files = [];
         if (!empty($this->repository->env)) {
             $files = array_merge($files, $this->files->glob("$path/{$this->repository->env}/*.php"));
@@ -127,10 +141,9 @@ class SeedFileMigrator extends Migrator {
         // First we will resolve a "real" instance of the migration class from this
         // migration file name. Once we have the instances we can run the actual
         // command such as "up" or "down", or we can just simulate the action.
-        $fullPath = $this->getAppNamespace().basename($file);
-        if(!class_exists($fullPath)) {
-            $fullPath = ucfirst(basename($file));
-        }
+        $filename = basename($file);
+        $className = $this->getClassNameFromFileName($filename);
+        $fullPath = $this->getAppNamespace().$className;
 
         $migration = new $fullPath();
 
@@ -144,9 +157,9 @@ class SeedFileMigrator extends Migrator {
         // Once we have run a migrations class, we will log that it was run in this
         // repository so that we don't try to run it next time we do a migration
         // in the application. A migration repository keeps the migrate order.
-        $this->repository->log($file, $batch);
+        $this->repository->log($filename, $batch);
 
-        $this->note("<info>Seeded:</info> $file");
+        $this->note("<info>Seeded:</info> $filename");
     }
 
     /**
@@ -158,12 +171,12 @@ class SeedFileMigrator extends Migrator {
      */
     protected function runDown($seed, $pretend)
     {
-        $file = basename($seed->seed);
+        $fileName = basename($seed->seed);
 
         // First we will get the file name of the migration so we can resolve out an
         // instance of the migration. Once we get an instance we can either run a
         // pretend execution of the migration or we can run the real migration.
-        $instance = $this->resolve($file);
+        $instance = $this->resolve($fileName);
 
         if ($pretend)
         {
@@ -179,7 +192,7 @@ class SeedFileMigrator extends Migrator {
         // by the application then will be able to fire by any later operation.
         $this->repository->delete($seed);
 
-        $this->note("<info>Rolled back:</info> $file");
+        $this->note("<info>Rolled back:</info> $fileName");
     }
 
     /**
@@ -188,20 +201,34 @@ class SeedFileMigrator extends Migrator {
      * @param  string  $file
      * @return object
      */
-    public function resolve($filePath)
+    public function resolve($fileName)
     {
-        //$filePath = database_path(config('smart-seeder.seedDir')."/".$file.".php");
+        $client = $this->getClient();
+        $file_path = client_path(config('smart-seeder.seedFileDir'));
+        $file_path = str_replace('{client}', $client, $file_path);
+
+        $filePath = $file_path.DIRECTORY_SEPARATOR.$fileName.'.php';
 
         if (File::exists($filePath)) {
             require_once $filePath;
-        }/* else if (!empty($this->repository->env)) {
+        } else {
+            return false;
+        }
+        /* else if (!empty($this->repository->env)) {
             require_once database_path($this->repository->env."/".$filePath.".php");
         } else {
             require_once database_path(config('smart-seeder.seedDir')."/".App::environment()."/".$filePath.".php");
         }*/
 
-        $fullPath = $this->getAppNamespace().$filePath;
+        $fullPath = $this->getAppNamespace().$this->getClassNameFromFileName($fileName);
 
         return new $fullPath;
+    }
+
+    private function getClassNameFromFileName($filename)
+    {
+        $output = ucfirst( camel_case(substr($filename, 18)) );
+
+        return $output;
     }
 } 

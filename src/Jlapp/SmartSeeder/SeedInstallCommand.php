@@ -34,16 +34,16 @@ class SeedInstallCommand extends Command {
      */
     protected $repository;
 
-    protected $repository_files;
+    //protected $repository_files;
 
 
     public function __construct(
-        SmartSeederRepository $repository,
-        SmartSeederFilesRepository $repository_files
+        SmartSeederRepository $repository
+        //SmartSeederFilesRepository $repository_files
     ) {
         parent::__construct();
         $this->repository = $repository;
-        $this->repository_files = $repository_files;
+        //$this->repository_files = $repository_files;
     }
     /**
      * Execute the console command.
@@ -58,10 +58,10 @@ class SeedInstallCommand extends Command {
         $message = (!$result) ? 'already exist' : 'created successfully';
         $this->info("Seeds table $message.");
 
-        $this->repository_files->setSource($this->input->getOption('database'));
+        /*$this->repository_files->setSource($this->input->getOption('database'));
         $result = $this->repository_files->createRepository();
         $message = (!$result) ? 'already exist' : 'created successfully';
-        $this->info("Seeds files table $message.");
+        $this->info("Seeds files table $message.");*/
     }
 
     /**

@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Support\Facades\Config;
 
-class SeedClientCommand extends Command {
+class SeedMasterCommand extends Command {
 
     use ConfirmableTrait;
     /**
@@ -14,7 +14,7 @@ class SeedClientCommand extends Command {
      *
      * @var string
      */
-    protected $name = 'seed:client:run';
+    protected $name = 'seed:master';
 
     private $migrator;
 
@@ -23,13 +23,13 @@ class SeedClientCommand extends Command {
      *
      * @var string
      */
-    protected $description = 'Seeds the client data files';
+    protected $description = 'Seeds the master data files';
 
-    public function __construct(SmartSeedMigrator $migrator) {
+
+    public function __construct(SeedFileMigrator $migrator) {
         parent::__construct();
         $this->migrator = $migrator;
     }
-
     /**
      * Execute the console command.
      *
@@ -46,20 +46,10 @@ class SeedClientCommand extends Command {
         // a database for real, which is helpful for double checking migrations.
         $pretend = $this->input->getOption('pretend');
 
-        $path = client_path(config('smart-seeder.seedDir'));
-        $file_path= client_path(config('smart-seeder.seedFileDir'));
-        $client = $this->option('client-name');
-        $file_path = str_replace('{client}', $client, $file_path);
+        $path = config('smart-seeder.seedMasterDir');
+        $file = config('smart-seeder.seedMasterFile');
+        $this->migrator->runSingleFile(client_path($path . $file), $pretend);
 
-        $env = $client;
-        $this->migrator->setEnv($env);
-
-        $single = $this->option('file');
-        if ($single) {
-            $this->migrator->runSingleFile("$path/$single", $pretend);
-        } else {
-            $this->migrator->run($file_path, $pretend);
-        }
 
         // Once the migrator has run we will grab the note output and send it out to
         // the console screen, since the migrator itself functions without having
@@ -96,7 +86,7 @@ class SeedClientCommand extends Command {
     protected function getOptions()
     {
         return array(
-            array('client-name', null, InputOption::VALUE_OPTIONAL, 'The client for which to run the seeds.', null),
+            array('client', null, InputOption::VALUE_OPTIONAL, 'The client for which to run the seeds.', null),
             array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'),
             array('file', null, InputOption::VALUE_OPTIONAL, 'Allows individual seed files to be run.', null),
 

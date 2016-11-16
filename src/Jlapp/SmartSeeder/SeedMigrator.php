@@ -63,6 +63,8 @@ class SeedMigrator extends Migrator {
         // the order they were actually created by the application developers.
         sort($files);
 
+        pm($files, 0);
+
         return $files;
     }
 
@@ -71,6 +73,8 @@ class SeedMigrator extends Migrator {
         foreach ($files as $file) {
             $this->files->requireOnce($file.'.php');
         }
+
+        pm($files);
     }
 
     protected function pretendToRun($migration, $method)
@@ -130,8 +134,13 @@ class SeedMigrator extends Migrator {
         $fullPath = $this->getAppNamespace().basename($file);
         $migration = new $fullPath();
 
+        echo "\n > ".($file);
+        echo "\n >> ".($batch);
+        echo "\n >>> ".($pretend); dd();
+
         if ($pretend)
         {
+            echo "\n >>>> Pretent to run:-> ".($file);
             return $this->pretendToRun($migration, 'run');
         }
 
