@@ -12,4 +12,7 @@ return array(
     'seedFileDir' => 'clients/{client}/seeds',
     'seedDataFileDir' => '/data',
     //'seedDir' => 'seeds/clients',
+
+    'seedMasterDir' => 'master_database/seeds/',
+    'seedMasterFile' => 'masterDatabaseSeeder.php',
 );

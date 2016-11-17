@@ -110,7 +110,7 @@ class SmartSeederServiceProvider extends ServiceProvider {
 
         $this->app->bind('seed:master', function($app)
         {
-            return new SeedMakeCommand($app['seed.smart_migrator']);
+            return new SeedMasterCommand($app['seed.smart_migrator']);
         });
 
         $this->commands([
