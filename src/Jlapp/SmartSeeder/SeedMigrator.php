@@ -63,8 +63,6 @@ class SeedMigrator extends Migrator {
         // the order they were actually created by the application developers.
         sort($files);
 
-        pm($files, 0);
-
         return $files;
     }
 
@@ -73,8 +71,6 @@ class SeedMigrator extends Migrator {
         foreach ($files as $file) {
             $this->files->requireOnce($file.'.php');
         }
-
-        pm($files);
     }
 
     protected function pretendToRun($migration, $method)

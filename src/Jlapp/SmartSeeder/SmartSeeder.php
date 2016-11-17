@@ -1,4 +1,5 @@
 <?php
+
 namespace Jlapp\SmartSeeder;
 
 use Illuminate\Console\Command;
@@ -21,6 +22,20 @@ class SmartSeeder extends Seeder
      */
     protected $command;
 
+    /*public function __construct()
+    {
+        $this->command = parent::setCommand();
+    }*/
+
+    /**
+     * The output interface implementation.
+     *
+     * @var \Illuminate\Console\OutputStyle
+     */
+    //protected $output;
+
+    public $seedFilePath;
+
     /**
      * Run the database seeds.
      *
@@ -29,6 +44,16 @@ class SmartSeeder extends Seeder
     public function run()
     {
         //
+    }
+
+    public function setSeedFilePath($seedFilePath)
+    {
+        $this->seedFilePath = $seedFilePath;
+    }
+
+    public function getSeedFilePath()
+    {
+        return $this->seedFilePath;
     }
 
     /**
@@ -40,6 +65,15 @@ class SmartSeeder extends Seeder
     public function call($class)
     {
         $this->resolve($class)->run();
+
+        if (isset($this->command)) {
+            $this->command->getOutput()->writeln("<info>Seeded:</info> $class");
+        }
+    }
+
+    public function callSeeder($class, $params = null)
+    {
+        $this->resolve($class)->run($params);
 
         if (isset($this->command)) {
             $this->command->getOutput()->writeln("<info>Seeded:</info> $class");
@@ -88,7 +122,7 @@ class SmartSeeder extends Seeder
      * @param  \Illuminate\Console\Command  $command
      * @return $this
      */
-    public function setCommand(Command $command)
+    public function setCommand1(Command $command)
     {
         $this->command = $command;
 
