@@ -1,6 +1,7 @@
 <?php
 namespace Jlapp\SmartSeeder;
 
+use Illuminate\Console\Command;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Console\AppNamespaceDetectorTrait;
@@ -128,6 +129,13 @@ class SmartSeedMigrator extends Migrator {
         $this->runMigrationList($migrations, $pretend);
     }
 
+    public function setCommand(Command $command)
+    {
+        $this->command = parent::setCommand($this);
+
+        return $this;
+    }
+
     /**
      * Run "up" a migration instance.
      *
@@ -145,7 +153,7 @@ class SmartSeedMigrator extends Migrator {
         $className = $this->getClassNameFromFileName($filename);
         $fullPath = $this->getAppNamespace().$className;
 
-        $migration = new $fullPath();
+        $migration = new $fullPath( new Command($this) );
 
         if ($pretend)
         {

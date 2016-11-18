@@ -2,9 +2,9 @@
 
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
-use Illuminate\Support\Facades\App;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Support\Facades\Config;
+use Jlapp\SmartSeeder\SeedMigrator;
 
 class SeedMasterCommand extends Command {
 
@@ -25,11 +25,11 @@ class SeedMasterCommand extends Command {
      */
     protected $description = 'Seeds the master data files';
 
-
-    public function __construct(SeedFileMigrator $migrator) {
+    public function __construct(SeedMigrator $migrator) {
         parent::__construct();
         $this->migrator = $migrator;
     }
+
     /**
      * Execute the console command.
      *
@@ -48,6 +48,7 @@ class SeedMasterCommand extends Command {
 
         $path = config('smart-seeder.seedMasterDir');
         $file = config('smart-seeder.seedMasterFile');
+
         $this->migrator->runSingleFile(client_path($path . $file), $pretend);
 
         // Once the migrator has run we will grab the note output and send it out to
@@ -85,7 +86,6 @@ class SeedMasterCommand extends Command {
     protected function getOptions()
     {
         return array(
-            array('client', null, InputOption::VALUE_OPTIONAL, 'The client for which to run the seeds.', null),
             array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'),
             array('file', null, InputOption::VALUE_OPTIONAL, 'Allows individual seed files to be run.', null),
 

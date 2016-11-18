@@ -6,6 +6,8 @@ use Illuminate\Console\Command;
 use Illuminate\Container\Container;
 use Illuminate\Database\Seeder;
 
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
+
 class SmartSeeder extends Seeder
 {
     /**
@@ -20,21 +22,19 @@ class SmartSeeder extends Seeder
      *
      * @var \Illuminate\Console\Command
      */
-    protected $command;
-
-    /*public function __construct()
-    {
-        $this->command = parent::setCommand();
-    }*/
+     protected $command;
 
     /**
      * The output interface implementation.
      *
      * @var \Illuminate\Console\OutputStyle
      */
-    //protected $output;
+     protected $output;
 
-    public $seedFilePath;
+    public function a__construct(Command $command)
+    {
+        $this->command = $command;
+    }
 
     /**
      * Run the database seeds.
@@ -46,23 +46,13 @@ class SmartSeeder extends Seeder
         //
     }
 
-    public function setSeedFilePath($seedFilePath)
-    {
-        $this->seedFilePath = $seedFilePath;
-    }
-
-    public function getSeedFilePath()
-    {
-        return $this->seedFilePath;
-    }
-
     /**
      * Seed the given connection from the given path.
      *
      * @param  string  $class
      * @return void
      */
-    public function call($class)
+    public function callSeeder($class)
     {
         $this->resolve($class)->run();
 
@@ -71,9 +61,9 @@ class SmartSeeder extends Seeder
         }
     }
 
-    public function callSeeder($class, $params = null)
+    public function call($class, $params = null)
     {
-        $this->resolve($class)->run($params);
+        $this->resolve($class)->run();
 
         if (isset($this->command)) {
             $this->command->getOutput()->writeln("<info>Seeded:</info> $class");
@@ -122,10 +112,30 @@ class SmartSeeder extends Seeder
      * @param  \Illuminate\Console\Command  $command
      * @return $this
      */
-    public function setCommand1(Command $command)
+   /* public function setCommand(Command $command)
     {
-        $this->command = $command;
+        $this->command = parent::setCommand($this);
 
         return $this;
+    }*/
+
+    public function getCommand()
+    {
+        return $this->command;
+    }
+
+    public function setOutput(OutputInterface $output)
+    {
+        $this->output = $output;
+        if( $output instanceof ConsoleOutputInterface )
+        {
+            // If it's available, get stdErr output
+            $this->output = $output->getErrorOutput();
+        }
+    }
+
+    public function getOutput()
+    {
+        $this->output;
     }
 }

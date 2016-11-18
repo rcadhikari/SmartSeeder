@@ -2,17 +2,17 @@
 
 use Symfony\Component\Console\Input\InputOption;
 
-class SeedOverrideCommand extends SeedCommand {
+class SeedOverrideCommand { // extends SeedCommand {
 
     /**
      * The console command name.
      *
      * @var string
      */
-    protected $name = 'db:seed';
+    //protected $name = 'db:seed';
 
     public function __construct(SeedMigrator $migrator) {
-        parent::__construct($migrator);
+        //parent::__construct($migrator);
     }
 
     /**

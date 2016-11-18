@@ -50,10 +50,15 @@ class SmartSeederServiceProvider extends ServiceProvider {
             return new SeedMigrator($app['seed.repository'], $app['db'], $app['files']);
         });
 
-        $this->app->bind('command.seed', function($app)
+        /*App::bindShared('seed.default-migrator', function($app)
+        {
+            return new SeedMigrator($app['seed.repository'], $app['db'], $app['files']);
+        });*/
+
+        /*$this->app->bind('command.seed', function($app)
         {
             return new SeedOverrideCommand($app['seed.migrator']);
-        });
+        });*/
 
         $this->app->bind('seed.run', function($app)
         {
@@ -110,17 +115,18 @@ class SmartSeederServiceProvider extends ServiceProvider {
 
         $this->app->bind('seed:master', function($app)
         {
-            return new SeedMasterCommand($app['seed.smart_migrator']);
+            return new SeedMasterCommand($app['seed.migrator']);
         });
 
         $this->commands([
-            'seed.run',
+            'seed.install',
+
+            /*'seed.run',
             'seed.install',
             'seed.make',
             'seed.reset',
             'seed.rollback',
-            'seed.refresh',
-
+            'seed.refresh',*/
             'seed.client.run',
             'seed.client.make',
             'seed:client:rollback',
@@ -138,13 +144,13 @@ class SmartSeederServiceProvider extends ServiceProvider {
         return [
             'seed.repository',
             'seed.migrator',
-            'command.seed',
+            /*'command.seed',
             'seed.run',
             'seed.install',
             'seed.make',
             'seed.reset',
             'seed.rollback',
-            'seed.refresh',
+            'seed.refresh',*/
 
             /*'seed.repository_files',
             */

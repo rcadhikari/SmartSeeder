@@ -130,13 +130,8 @@ class SeedMigrator extends Migrator {
         $fullPath = $this->getAppNamespace().basename($file);
         $migration = new $fullPath();
 
-        echo "\n > ".($file);
-        echo "\n >> ".($batch);
-        echo "\n >>> ".($pretend); dd();
-
         if ($pretend)
         {
-            echo "\n >>>> Pretent to run:-> ".($file);
             return $this->pretendToRun($migration, 'run');
         }
 

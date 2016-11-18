@@ -5,6 +5,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Illuminate\Support\Facades\App;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Support\Facades\Config;
+use Jlapp\SmartSeeder\SeedMigrator;
 
 class SeedCommand extends Command {
 
