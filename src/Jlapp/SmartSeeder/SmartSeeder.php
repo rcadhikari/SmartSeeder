@@ -63,7 +63,7 @@ class SmartSeeder extends Seeder
 
     public function call($class, $params = null)
     {
-        $this->resolve($class)->run();
+        $this->resolve($class)->run($params);
 
         if (isset($this->command)) {
             $this->command->getOutput()->writeln("<info>Seeded:</info> $class");
@@ -132,10 +132,5 @@ class SmartSeeder extends Seeder
             // If it's available, get stdErr output
             $this->output = $output->getErrorOutput();
         }
-    }
-
-    public function getOutput()
-    {
-        $this->output;
     }
 }

@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Support\Facades\Config;
 use Jlapp\SmartSeeder\SmartSeedMigrator;
-use Symfony\Component\Console\Output\ConsoleOutputInterface;
 
 class SeedClientCommand extends Command {
 
@@ -34,21 +33,7 @@ class SeedClientCommand extends Command {
     public function __construct(SmartSeedMigrator $migrator) {
         parent::__construct();
         $this->migrator = $migrator;
-
-        //$this->command = $this->getThisOutput();
     }
-
-    /*public function getThisOutput()
-    {
-        // Default $stdErr variable to output
-        $this->output = $this->getOutput();
-
-        if( $this->getOutput() instanceof ConsoleOutputInterface )
-        {
-            // If it's available, get stdErr output
-            $this->output = $this->getOutput()->getErrorOutput();
-        }
-    }*/
 
     /**
      * Execute the console command.
