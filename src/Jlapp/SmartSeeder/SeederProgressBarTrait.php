@@ -27,7 +27,7 @@ trait SeederProgressBarTrait
         /** @noinspection PhpUndefinedFieldInspection */
         //$dimensions = $style->getApplication()->getTerminalDimensions();
         $progress = new ProgressBar($this->output);
-        $progress->setFormat('Seeding: <info>' . get_called_class() . "</info>\n%current:4s%/%max:-4s% [%bar%] %percent:4s%% %elapsed:6s%/%estimated:-6s%");
+        $progress->setFormat('Seeding: <info>' . get_called_class() . "</info>\n%current:4s%/%max:-4s% [%bar%] %percent:4s%% %elapsed:6s%/%estimated:-6s%\n");
 
         return $progress;
     }

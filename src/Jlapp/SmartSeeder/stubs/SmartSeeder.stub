@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Eloquent\Model;
 use Jlapp\SmartSeeder\SmartSeeder;
+use DB;
 
 class {{model}} extends SmartSeeder
 {
@@ -13,6 +14,18 @@ class {{model}} extends SmartSeeder
     public function run()
     {
         Model::unguard();
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
+        /*
+        $seedFilePath = base_path('/seeder_file_path/users.csv');
+        $params = [
+                      'counter' => 100, //TODO: No of rows for the progress status.
+                      'filePath' => $seedFilePath
+                  ];
+        $this->call('{{model}}', $params);*/
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
     }
 

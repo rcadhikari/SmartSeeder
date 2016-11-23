@@ -61,7 +61,7 @@ class SeedClientMakeCommand extends Command {
         $stub = str_replace('{{class}}', $model, $stub);
         File::put($path, $stub);
 
-        $message = "Seed [$model] created";
+        $message = "Seeder class <info>$model</info> created";
         if (!empty($client)) {
             $message .= " for client: $client";
         }

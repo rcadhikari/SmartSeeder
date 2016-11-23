@@ -52,15 +52,6 @@ class SmartSeeder extends Seeder
      * @param  string  $class
      * @return void
      */
-    public function callSeeder($class)
-    {
-        $this->resolve($class)->run();
-
-        if (isset($this->command)) {
-            $this->command->getOutput()->writeln("<info>Seeded:</info> $class");
-        }
-    }
-
     public function call($class, $params = null)
     {
         $this->resolve($class)->run($params);
