@@ -61,8 +61,9 @@ class SeedClientCommand extends Command {
 
         $single = $this->option('file');
         if ($single) {
-            $this->migrator->runSingleFile("$path/$single", $pretend);
-        } else {
+            $this->migrator->runSingleFile("$file_path/$single", $pretend);
+        }
+        else {
             $this->migrator->run($file_path, $pretend);
         }
 

@@ -124,6 +124,9 @@ class SmartSeedMigrator extends Migrator {
         if (!$filename_ext) {
             $path .= ".php";
         }
+        $filename = basename($file);
+        $className = $this->getClassNameFromFileName($filename);
+        $fullPath = $this->getAppNamespace().$className;
         $this->files->requireOnce($path);
 
         $this->runMigrationList($migrations, $pretend);
