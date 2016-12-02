@@ -59,13 +59,15 @@ class SmartSeedMigrator extends Migrator {
         if (!empty($this->repository->env)) {
             $files = array_merge($files, $this->files->glob("$path/{$this->repository->env}/*.php"));
         }
-
         $files = array_merge($files, $this->files->glob($path.'/*.php'));
 
         // Once we have the array of files in the directory we will just remove the
         // extension and take the basename of the file which is all we need when
         // finding the migrations that haven't been run against the databases.
         if ($files === false) return array();
+
+        // Filter only New Seeders only
+        $files = $this->getFilterNewSeedersOnly($files);
 
         $files = array_map(function($file)
         {
@@ -241,5 +243,40 @@ class SmartSeedMigrator extends Migrator {
         $output = ucfirst( camel_case(substr($filename, 18)) );
 
         return $output;
+    }
+
+    /**
+     * This function will parse all the existing seeders for the client.
+     * - it will also get all the already ran seeders from database.
+     * - then, it only filter the difference and return only new seeder files.
+     *
+     * @param array $files
+     * @return array
+     */
+    private function getFilterNewSeedersOnly($files=[])
+    {
+        // This is the list of all seeder class which exist for the client
+        $all_seeders = $files;
+
+        // Get the list of ran files
+        $ran_files = $this->repository->getRan();
+
+        $client = $this->repository->env;
+        $file_path = client_path(config('smart-seeder.seedFileDir'));
+        $file_path = str_replace('{client}', $client, $file_path);
+
+        // filter all seeder by their filename only;
+        $all_seeders_files = [];
+        foreach ($all_seeders as $file) {
+            $filename = str_replace($file_path.'/', '', $file);
+            $filename = str_replace('.php', '', $filename);
+            $filename = trim($filename);
+
+            // only add which is not in a ran files list.
+            if (!in_array($filename, $ran_files)) {
+                $all_seeders_files[] = $file;
+            }
+        }
+        return $all_seeders_files;
     }
 } 
