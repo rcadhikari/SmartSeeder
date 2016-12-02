@@ -39,7 +39,15 @@ class SeedClientMakeCommand extends Command {
         $file_path = str_replace('{client}', $client, $file_path);
         $data_path = config('smart-seeder.seedDataFileDir');
 
-        $model = ucfirst($this->argument('model'));
+        $seed_file = $this->argument('seed');
+
+        // Return the error message if no extension found.
+        if (strpos($seed_file, '.') === false) {
+            pc('Please enter the seed(seed file) extension.', 1);
+        }
+        // To remove the seed file extension.
+        $seed_name = substr($seed_file,0, strpos($seed_file, '.'));
+        $model = ucfirst(camel_case($seed_name));
         $path = $this->option('seeder-path');
 
         $path = (empty($path)) ? $file_path : base_path($path);
@@ -59,6 +67,8 @@ class SeedClientMakeCommand extends Command {
         $stub = str_replace('{{model}}', $model.'Seeder', $fs);
         $stub = str_replace('{{namespace}}', " namespace $namespace;", $stub);
         $stub = str_replace('{{class}}', $model, $stub);
+        $stub = str_replace('{{seed_file}}', $seed_file, $stub);
+
         File::put($path, $stub);
 
         $message = "Seeder class <info>$model</info> created";
@@ -77,7 +87,7 @@ class SeedClientMakeCommand extends Command {
     protected function getArguments()
     {
         return array(
-            array('model', InputArgument::REQUIRED, 'The name of the model you wish to seed.'),
+            array('seed', InputArgument::REQUIRED, 'The name of the model you wish to seed.'),
         );
     }
 

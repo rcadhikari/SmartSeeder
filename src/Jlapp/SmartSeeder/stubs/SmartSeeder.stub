@@ -16,15 +16,16 @@ class {{model}} extends SmartSeeder
         Model::unguard();
 
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        /*
-        $seedFilePath = base_path('{client_name}/seeds/data/seeder_file.csv');
+        $seedFilePath = __DIR__ . '/data/{{seed_file}}';
+
         $params = [
-            'counter' => 100, //TODO: No of rows for the progress status.
+            'counter' => (count(file($seedFilePath)) - 1), // Adding the number of rows of seed file
             'filePath' => $seedFilePath
         ];
-        $this->call('{{model}}', $params); */
+        $this->call('{{model}}', $params);
 
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
     }
 
     /**
