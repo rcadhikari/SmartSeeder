@@ -35,6 +35,7 @@ class SeedClientMakeCommand extends Command {
     public function fire()
     {
         $client = $this->option('client-name');
+        $calls = $this->argument('calls');
         $file_path= client_path(config('smart-seeder.seedFileDir'));
         $file_path = str_replace('{client}', $client, $file_path);
         $data_path = config('smart-seeder.seedDataFileDir');
@@ -63,10 +64,13 @@ class SeedClientMakeCommand extends Command {
 
         $fs = File::get(__DIR__."/stubs/SmartSeeder.stub");
 
+        $model = "{$model}Seeder_{$created}";
+
         $namespace = rtrim($this->getAppNamespace(), "\\");
-        $stub = str_replace('{{model}}', $model.'Seeder', $fs);
+        $stub = str_replace('{{model}}', $model, $fs);
         $stub = str_replace('{{namespace}}', " namespace $namespace;", $stub);
         $stub = str_replace('{{class}}', $model, $stub);
+        $stub = str_replace('{{calls}}', $calls, $stub);
         $stub = str_replace('{{seed_file}}', $seed_file, $stub);
 
         File::put($path, $stub);
@@ -88,6 +92,7 @@ class SeedClientMakeCommand extends Command {
     {
         return array(
             array('seed', InputArgument::REQUIRED, 'The name of the model you wish to seed.'),
+            array('calls', InputArgument::REQUIRED, 'The name of the existing client seeder class(/database/seeds/client) you wish to call (use for parsing the seed file for seeding).'),
         );
     }
 

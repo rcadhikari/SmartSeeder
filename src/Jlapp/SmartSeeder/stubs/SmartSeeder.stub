@@ -22,10 +22,9 @@ class {{model}} extends SmartSeeder
             'counter' => (count(file($seedFilePath)) - 1), // Adding the number of rows of seed file
             'filePath' => $seedFilePath
         ];
-        $this->call('{{model}}', $params);
+        $this->call('{{calls}}', $params);
 
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-
     }
 
     /**

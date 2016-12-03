@@ -222,6 +222,8 @@ class SmartSeedMigrator extends Migrator {
 
         $filePath = $file_path.DIRECTORY_SEPARATOR.$fileName.'.php';
 
+        pc($filePath, 1);
+
         if (File::exists($filePath)) {
             require_once $filePath;
         } else {
@@ -240,7 +242,9 @@ class SmartSeedMigrator extends Migrator {
 
     private function getClassNameFromFileName($filename)
     {
+        $timestamp = substr($filename, 0, 17);
         $output = ucfirst( camel_case(substr($filename, 18)) );
+        $output .= '_'.$timestamp;
 
         return $output;
     }
