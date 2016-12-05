@@ -41,7 +41,7 @@ class SmartSeederServiceProvider extends ServiceProvider {
         /*App::bindShared('seed.repository_files', function($app) {
             return new SmartSeederFilesRepository(
                 $app['db'],
-                config('smart-seeder.seedFileTable') // for seeder files table;
+                config('smart-seeder.ClientSeedFileTable') // for seeder files table;
             );
         });*/
 
@@ -108,6 +108,11 @@ class SmartSeederServiceProvider extends ServiceProvider {
             return new SeedClientMakeCommand($app['seed.smart_migrator']);
         });
 
+        $this->app->bind('seed:core:make', function($app)
+        {
+            return new SeedCoreMakeCommand($app['seed.smart_migrator']);
+        });
+
         $this->app->bind('seed:client:rollback', function($app)
         {
             return new SeedClientRollbackCommand($app['seed.smart_migrator']);
@@ -127,6 +132,7 @@ class SmartSeederServiceProvider extends ServiceProvider {
             'seed.reset',
             'seed.rollback',
             'seed.refresh',*/
+            'seed:core:make',
             'seed.client.run',
             'seed.client.make',
             'seed:client:rollback',
@@ -154,6 +160,7 @@ class SmartSeederServiceProvider extends ServiceProvider {
 
             /*'seed.repository_files',
             */
+            'seed:core:make',
             'seed.smart_migrator',
             'seed.client.run',
             'seed.client.make',

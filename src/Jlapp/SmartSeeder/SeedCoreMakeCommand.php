@@ -9,7 +9,7 @@ use File;
 use App;
 use Config;
 
-class SeedClientMakeCommand extends Command {
+class SeedCoreMakeCommand extends Command {
 
     use AppNamespaceDetectorTrait;
 
@@ -18,14 +18,14 @@ class SeedClientMakeCommand extends Command {
      *
      * @var string
      */
-    protected $name = 'seed:client:make';
+    protected $name = 'seed:core:make';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Makes a seed for client';
+    protected $description = 'Makes a seed for core via smart seeder';
 
     /**
      * Execute the console command.
@@ -34,12 +34,8 @@ class SeedClientMakeCommand extends Command {
      */
     public function fire()
     {
-        $client = $this->option('client-name');
-        $calls = $this->argument('calls');
-        $file_path= client_path(config('smart-seeder.clientSeedFileDir'));
-        $file_path = str_replace('{client}', $client, $file_path);
+        $file_path= client_path(config('smart-seeder.coreSeedFileDir'));
         $data_path = config('smart-seeder.dataFileDir');
-
         $seed_file = $this->argument('seed');
 
         // Return the error message if no extension found.
@@ -49,38 +45,41 @@ class SeedClientMakeCommand extends Command {
         // To remove the seed file extension.
         $seed_name = substr($seed_file,0, strpos($seed_file, '.'));
         $model = ucfirst(camel_case($seed_name));
-        $path = $this->option('seeder-path');
 
-        $path = (empty($path)) ? $file_path : base_path($path);
+        $path = $file_path;
         $data_path = $path . $data_path;
 
         if (!File::exists($data_path)) {
             // mode 0755 is based on the default mode Laravel use.
             File::makeDirectory($data_path, 755, true);
         }
+
         $created = date('Y_m_d_His');
-        $model_filename = snake_case($model);
-        $path .= "/{$created}_{$model_filename}_seeder.php";
+        $table = snake_case($model);
+        $path .= DIRECTORY_SEPARATOR."{$created}_{$table}_seeder.php";
+        $seedFile = "{$table}_table_data.php";
+        $data_path .= DIRECTORY_SEPARATOR.$seedFile;
 
-        $fs = File::get(__DIR__."/stubs/ClientSeeder.stub");
+        // Creating Seeder file
+        $fs = File::get(__DIR__.DIRECTORY_SEPARATOR."stubs".DIRECTORY_SEPARATOR."CoreSeeder.stub");
 
+        $eloquentModel = $model;
         $model = "{$model}Seeder_{$created}";
 
         $namespace = rtrim($this->getAppNamespace(), "\\");
         $stub = str_replace('{{model}}', $model, $fs);
         $stub = str_replace('{{namespace}}', " namespace $namespace;", $stub);
-        $stub = str_replace('{{class}}', $model, $stub);
-        $stub = str_replace('{{calls}}', $calls, $stub);
+        $stub = str_replace('{{eloquentModel}}', $eloquentModel, $stub);
+        $stub = str_replace('{{table}}', $table, $stub);
         $stub = str_replace('{{seed_file}}', $seed_file, $stub);
 
         File::put($path, $stub);
 
-        $message = "Seeder class <info>$model</info> created";
-        if (!empty($client)) {
-            $message .= " for client: $client";
-        }
+        // Creating Seeder Data file
+        $stub = File::get(__DIR__."/stubs/CoreSeederDataFile.stub");
+        File::put($data_path, $stub);
 
-        $this->line($message);
+        $this->line("Seeder class <info>$model</info> and data file <info>$seedFile</info> created for a Core");
     }
 
     /**
@@ -92,7 +91,7 @@ class SeedClientMakeCommand extends Command {
     {
         return array(
             array('seed', InputArgument::REQUIRED, 'The name of the model you wish to seed.'),
-            array('calls', InputArgument::REQUIRED, 'The name of the existing client seeder class(/database/seeds/client) you wish to call (use for parsing the seed file for seeding).'),
+            //array('calls', InputArgument::REQUIRED, 'The name of the existing client seeder class(/database/seeds/client) you wish to call (use for parsing the seed file for seeding).'),
         );
     }
 
@@ -104,8 +103,9 @@ class SeedClientMakeCommand extends Command {
     protected function getOptions()
     {
         return array(
-            array('client-name', null, InputOption::VALUE_OPTIONAL, 'The client name to seed to.', null),
-            array('seeder-path', null, InputOption::VALUE_OPTIONAL, 'The relative path to the base path to generate the seed to.', null),
+            array('seed', null, InputOption::VALUE_REQUIRED, 'The name of the model you wish to seed.', null),
+            //array('seed', null, InputOption::VALUE_REQUIRED, 'The  name to seed to.', null),
+            //array('seeder-path', null, InputOption::VALUE_OPTIONAL, 'The relative path to the base path to generate the seed to.', null),
         );
     }
 }

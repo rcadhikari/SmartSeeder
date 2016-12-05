@@ -51,8 +51,8 @@ class SeedClientCommand extends Command {
         // a database for real, which is helpful for double checking migrations.
         $pretend = $this->input->getOption('pretend');
 
-        $path = client_path(config('smart-seeder.seedDir'));
-        $file_path= client_path(config('smart-seeder.seedFileDir'));
+        $path = client_path(config('smart-seeder.clientSeedDir'));
+        $file_path= client_path(config('smart-seeder.clientSeedFileDir'));
         $client = $this->option('client-name');
         $file_path = str_replace('{client}', $client, $file_path);
 

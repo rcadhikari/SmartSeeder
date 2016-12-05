@@ -53,7 +53,7 @@ class SmartSeedMigrator extends Migrator {
      */
     public function getMigrationFiles($path)
     {
-        $data_path= $path.config('smart-seeder.seedDataFileDir');
+        $data_path= $path.config('smart-seeder.dataFileDir');
 
         $files = [];
         if (!empty($this->repository->env)) {
@@ -229,11 +229,6 @@ class SmartSeedMigrator extends Migrator {
         } else {
             return false;
         }
-        /* else if (!empty($this->repository->env)) {
-            require_once database_path($this->repository->env."/".$filePath.".php");
-        } else {
-            require_once database_path(config('smart-seeder.seedDir')."/".App::environment()."/".$filePath.".php");
-        }*/
 
         $fullPath = $this->getAppNamespace().$this->getClassNameFromFileName($fileName);
 

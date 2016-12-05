@@ -51,10 +51,10 @@ class SeedClientRollbackCommand extends Command
         $this->migrator->setClient($client);
         $this->migrator->setConnection('cli');
 
-        $file_path= client_path(config('smart-seeder.seedFileDir'));
+        $file_path= client_path(config('smart-seeder.clientSeedFileDir'));
         $file_path = str_replace('{client}', $client, $file_path);
 
-        //if (File::exists(database_path(config('smart-seeder.seedsDir')))) {
+        //if (File::exists(database_path(config('smart-seeder.ClientSeedsDir')))) {
         if (File::exists($file_path)) {
             $this->migrator->setEnv($client);
         }
