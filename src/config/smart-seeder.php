@@ -8,10 +8,25 @@ return array(
     'seedTable' => 'seeds',
     'seedFileTable' => 'seeds_files',
 
-    'seedDir' => 'seeds/clients',
-    'seedFileDir' => 'clients/{client}/seeds',
-    'seedDataFileDir' => '/data',
+    'dataFileDir' => '/data',
 
+    /* For Default Seeder */
+    'seedDir' => 'seeds/clients',
+    'seedFileDir' => 'database/seeds/core',
+
+    /* For Core Seeder */
+    //'coreSeedDir' => 'seeds/clients',
+    'coreSeedFileDir' => 'database/seeds/core1',
+
+    /* For Client Seeder */
+    'clientSeedDir' => 'seeds/clients',
+    'clientSeedFileDir' => 'clients/{client}/seeds',
+
+    /* For Master Seeder */
     'seedMasterDir' => 'master_database/seeds/',
-    'seedMasterFile' => 'masterDatabaseSeeder.php',
+    'seedMasterFile' => 'MasterDatabaseSeeder.php',
+
+    /* For Master Seeder */
+    'masterSeedDir' => 'seeds/clients',
+    'masterSeedFileDir' => 'clients/{client}/seeds'
 );
