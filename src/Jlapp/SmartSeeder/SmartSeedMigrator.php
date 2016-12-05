@@ -35,6 +35,10 @@ class SmartSeedMigrator extends Migrator {
         $this->repository->setEnv($env);
     }
 
+    public function setSeedType($seedType) {
+        $this->repository->setSeedType($seedType);
+    }
+
     public function setClient($client)
     {
         $this->client = $client;
@@ -53,7 +57,7 @@ class SmartSeedMigrator extends Migrator {
      */
     public function getMigrationFiles($path)
     {
-        $data_path= $path.config('smart-seeder.dataFileDir');
+        $data_path = $path.config('smart-seeder.dataFileDir');
 
         $files = [];
         if (!empty($this->repository->env)) {
@@ -222,8 +226,6 @@ class SmartSeedMigrator extends Migrator {
 
         $filePath = $file_path.DIRECTORY_SEPARATOR.$fileName.'.php';
 
-        pc($filePath, 1);
-
         if (File::exists($filePath)) {
             require_once $filePath;
         } else {
@@ -261,8 +263,20 @@ class SmartSeedMigrator extends Migrator {
         $ran_files = $this->repository->getRan();
 
         $client = $this->repository->env;
-        $file_path = client_path(config('smart-seeder.seedFileDir'));
-        $file_path = str_replace('{client}', $client, $file_path);
+        $seedType = $this->repository->seedType;
+
+        if ($seedType === 'client') {
+            $file_path = client_path(config('smart-seeder.clientSeedFileDir'));
+            $file_path = str_replace('{client}', $client, $file_path);
+        } else {
+            // Seeding for core;
+            $file_path = client_path(config('smart-seeder.coreSeedFileDir'));
+        }
+
+        /*pc ($files);
+        pc ($ran_files);
+
+        pc($file_path);*/
 
         // filter all seeder by their filename only;
         $all_seeders_files = [];
@@ -276,6 +290,7 @@ class SmartSeedMigrator extends Migrator {
                 $all_seeders_files[] = $file;
             }
         }
+
         return $all_seeders_files;
     }
 } 

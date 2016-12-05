@@ -57,8 +57,8 @@ class SeedCoreMakeCommand extends Command {
         $created = date('Y_m_d_His');
         $table = snake_case($model);
         $path .= DIRECTORY_SEPARATOR."{$created}_{$table}_seeder.php";
-        $seedFile = "{$table}_table_data.php";
-        $data_path .= DIRECTORY_SEPARATOR.$seedFile;
+        $seedDataFile = "{$table}_table_data.php";
+        $data_path .= DIRECTORY_SEPARATOR.$seedDataFile;
 
         // Creating Seeder file
         $fs = File::get(__DIR__.DIRECTORY_SEPARATOR."stubs".DIRECTORY_SEPARATOR."CoreSeeder.stub");
@@ -71,7 +71,7 @@ class SeedCoreMakeCommand extends Command {
         $stub = str_replace('{{namespace}}', " namespace $namespace;", $stub);
         $stub = str_replace('{{eloquentModel}}', $eloquentModel, $stub);
         $stub = str_replace('{{table}}', $table, $stub);
-        $stub = str_replace('{{seed_file}}', $seed_file, $stub);
+        $stub = str_replace('{{seedDataFile}}', $seedDataFile, $stub);
 
         File::put($path, $stub);
 
@@ -79,7 +79,7 @@ class SeedCoreMakeCommand extends Command {
         $stub = File::get(__DIR__."/stubs/CoreSeederDataFile.stub");
         File::put($data_path, $stub);
 
-        $this->line("Seeder class <info>$model</info> and data file <info>$seedFile</info> created for a Core");
+        $this->line("Seeder class <info>$model</info> and data file <info>$seedDataFile</info> created for a Core");
     }
 
     /**

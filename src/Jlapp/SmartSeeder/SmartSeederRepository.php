@@ -35,6 +35,13 @@ class SmartSeederRepository implements MigrationRepositoryInterface {
      */
     public $env;
 
+    /**
+     * The name of the seeder type to run for
+     *
+     * @var string
+     */
+    public $seedType;
+
     const envVar = 'client';
 
     /**
@@ -56,6 +63,15 @@ class SmartSeederRepository implements MigrationRepositoryInterface {
      */
     public function setEnv($env) {
         $this->env = $env;
+    }
+
+    /**
+     * Set the environment to run the seeds against
+     *
+     * @param $env
+     */
+    public function setSeedType($seedType) {
+        $this->seedType = $seedType;
     }
 
     /**

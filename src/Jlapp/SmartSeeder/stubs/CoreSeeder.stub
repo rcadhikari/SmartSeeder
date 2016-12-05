@@ -4,9 +4,12 @@ use Illuminate\Database\Eloquent\Model;
 use Jlapp\SmartSeeder\SmartSeeder;
 use Jlapp\SmartSeeder\SeederProgressBarTrait;
 use App\Models\{{eloquentModel}};
+use DB;
 
 class {{model}} extends SmartSeeder
 {
+    use SeederProgressBarTrait;
+
     protected $structure = [
           0 => 'id',
     ];
@@ -18,11 +21,12 @@ class {{model}} extends SmartSeeder
      */
     public function run()
     {
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         DB::table('{{table}}')->delete();
 
         $progress = $this->createProgressBar();
 
-        $data = include(__DIR__ . '/data/{{seed_file}}');
+        $data = include(__DIR__ . '/data/{{seedDataFile}}');
         //$this->command->line('<info>Inserting data:</info> {{table}}';
         $counter = count($data); // Adding the number of rows of seed file
         $progress->start($counter);
@@ -47,6 +51,7 @@ class {{model}} extends SmartSeeder
         $progress->finish();
         $this->command->getOutput()->writeln('');
 
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 
     protected function create($values)
