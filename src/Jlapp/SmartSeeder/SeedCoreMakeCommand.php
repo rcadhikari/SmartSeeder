@@ -39,12 +39,13 @@ class SeedCoreMakeCommand extends Command {
         $seed_file = $this->argument('seed');
 
         // Return the error message if no extension found.
-        if (strpos($seed_file, '.') === false) {
+        /*if (strpos($seed_file, '.') === false) {
             $this->line("\nPlease enter the seed(seed file) <info>extension</info>.");dd();
         }
         // To remove the seed file extension.
         $seed_name = substr($seed_file,0, strpos($seed_file, '.'));
-        $model = ucfirst(camel_case($seed_name));
+        */
+        $model = ucfirst(camel_case($seed_file));
 
         $path = $file_path;
         $data_path = $path . $data_path;
@@ -58,6 +59,7 @@ class SeedCoreMakeCommand extends Command {
         $table = snake_case($model);
         $path .= DIRECTORY_SEPARATOR."{$created}_{$table}_seeder.php";
         $seedDataFile = "{$table}_table_data.php";
+
         $data_path .= DIRECTORY_SEPARATOR.$seedDataFile;
 
         // Creating Seeder file
