@@ -15,8 +15,7 @@ return array(
     'seedFileDir' => 'database/seeds/core',
 
     /* For Core Seeder */
-    //'coreSeedDir' => 'seeds/clients',
-    'coreSeedFileDir' => 'database/seeds/core1',
+    'coreSeedFileDir' => 'database/seeds/core',
 
     /* For Client Seeder */
     'clientSeedDir' => 'seeds/clients',
