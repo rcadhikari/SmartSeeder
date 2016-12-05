@@ -108,6 +108,7 @@ class SeedClientCommand extends Command {
             array('client-name', null, InputOption::VALUE_OPTIONAL, 'The client for which to run the seeds.', null),
             array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'),
             array('file', null, InputOption::VALUE_OPTIONAL, 'Allows individual seed files to be run.', null),
+            //array('fkc-off', null, InputOption::VALUE_OPTIONAL, 'Allows to turn off the foreign key constraint check.', null),
 
             array('force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'),
             array('pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'),

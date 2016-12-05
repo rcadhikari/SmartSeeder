@@ -11,7 +11,7 @@ class {{model}} extends SmartSeeder
     use SeederProgressBarTrait;
 
     protected $structure = [
-          0 => 'id',
+        0 => 'id',
     ];
 
     /**
@@ -21,7 +21,6 @@ class {{model}} extends SmartSeeder
      */
     public function run()
     {
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         DB::table('{{table}}')->delete();
 
         $progress = $this->createProgressBar();
@@ -49,9 +48,6 @@ class {{model}} extends SmartSeeder
             {{eloquentModel}}::insert($dataArray);
         }
         $progress->finish();
-        $this->command->getOutput()->writeln('');
-
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 
     protected function create($values)

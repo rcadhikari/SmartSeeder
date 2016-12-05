@@ -63,7 +63,7 @@ class SeedCoreMakeCommand extends Command {
         // Creating Seeder file
         $fs = File::get(__DIR__.DIRECTORY_SEPARATOR."stubs".DIRECTORY_SEPARATOR."CoreSeeder.stub");
 
-        $eloquentModel = $model;
+        $eloquentModel = substr($model, 0,-1);
         $model = "{$model}Seeder_{$created}";
 
         $namespace = rtrim($this->getAppNamespace(), "\\");
