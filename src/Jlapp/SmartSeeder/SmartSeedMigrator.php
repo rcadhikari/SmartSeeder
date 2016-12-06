@@ -162,6 +162,11 @@ class SmartSeedMigrator extends Migrator {
         $className = $this->getClassNameFromFileName($filename);
         $fullPath = $this->getAppNamespace().$className;
 
+        if(!class_exists($fullPath))
+        {
+            $fullPath = $className;
+        }
+
         $migration = new $fullPath( new Command($this) );
 
         if ($pretend)
@@ -239,10 +244,15 @@ class SmartSeedMigrator extends Migrator {
 
     private function getClassNameFromFileName($filename)
     {
-        $timestamp = substr($filename, 0, 17);
-        $output = ucfirst( camel_case(substr($filename, 18)) );
-        $output .= '_'.$timestamp;
 
+        $timestamp = substr($filename, 0, 17);
+        if(preg_match('/\d{4}_\d{2}_\d{2}_\d{6}/',trim($timestamp))) {
+            $output = ucfirst(camel_case(substr($filename, 18)));
+            $output .= '_' . $timestamp;
+        }
+        else{
+            $output=$filename;
+        }
         return $output;
     }
 
