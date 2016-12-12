@@ -278,7 +278,11 @@ class SmartSeedMigrator extends Migrator {
         if ($seedType === 'client') {
             $file_path = client_path(config('smart-seeder.clientSeedFileDir'));
             $file_path = str_replace('{client}', $client, $file_path);
-        } else {
+        }
+        else if ($seedType === 'master') {
+            $file_path = client_path(config('smart-seeder.masterSeedFileDir'));
+        }
+        else {
             // Seeding for core;
             $file_path = client_path(config('smart-seeder.coreSeedFileDir'));
         }

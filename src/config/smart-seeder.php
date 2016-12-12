@@ -22,10 +22,5 @@ return array(
     'clientSeedFileDir' => 'clients/{client}/seeds',
 
     /* For Master Seeder */
-    'seedMasterDir' => 'master_database/seeds/',
-    'seedMasterFile' => 'MasterDatabaseSeeder.php',
-
-    /* For Master Seeder */
-    'masterSeedDir' => 'seeds/clients',
-    'masterSeedFileDir' => 'clients/{client}/seeds'
+    'masterSeedFileDir' => 'master_database/seeds'
 );

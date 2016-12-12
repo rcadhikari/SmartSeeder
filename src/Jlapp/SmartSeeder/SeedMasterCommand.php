@@ -4,7 +4,7 @@ use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Support\Facades\Config;
-use Jlapp\SmartSeeder\SeedMigrator;
+use Jlapp\SmartSeeder\SmartSeedMigrator;
 
 class SeedMasterCommand extends Command {
 
@@ -14,9 +14,13 @@ class SeedMasterCommand extends Command {
      *
      * @var string
      */
-    protected $name = 'seed:master';
+    protected $name = 'seed:master:run';
 
     private $migrator;
+
+    protected $command;
+
+    protected $output;
 
     /**
      * The console command description.
@@ -25,7 +29,7 @@ class SeedMasterCommand extends Command {
      */
     protected $description = 'Seeds the master data files';
 
-    public function __construct(SeedMigrator $migrator) {
+    public function __construct(SmartSeedMigrator $migrator) {
         parent::__construct();
         $this->migrator = $migrator;
     }
@@ -35,7 +39,7 @@ class SeedMasterCommand extends Command {
      *
      * @return mixed
      */
-    public function fire()
+    public function fire1()
     {
         if ( ! $this->confirmToProceed()) return;
 
@@ -60,6 +64,32 @@ class SeedMasterCommand extends Command {
         }
     }
 
+    public function fire()
+    {
+        if ( ! $this->confirmToProceed()) return;
+
+        $this->prepareDatabase();
+
+        // The pretend option can be used for "simulating" the migration and grabbing
+        // the SQL queries that would fire if the migration were to be run against
+        // a database for real, which is helpful for double checking migrations.
+        $pretend = $this->input->getOption('pretend');
+
+        $file_path= client_path(config('smart-seeder.masterSeedFileDir'));
+
+        // Set the Seed Type as 'master';
+        $this->migrator->setSeedType('master');
+
+        $single = $this->option('file');
+
+        if ($single) {
+            $this->migrator->runSingleFile("$file_path/$single", $pretend);
+        }
+        else {
+            $this->migrator->run($file_path, $pretend);
+        }
+    }
+
     /**
      * Prepare the migration database for running.
      *
@@ -76,7 +106,6 @@ class SeedMasterCommand extends Command {
             $this->call('seed:install', $options);
         }
     }
-
 
     /**
      * Get the console command options.
