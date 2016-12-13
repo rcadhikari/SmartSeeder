@@ -73,16 +73,20 @@ class SmartSeedMigrator extends Migrator {
         // Filter only New Seeders only
         $files = $this->getFilterNewSeedersOnly($files);
 
-        $files = array_map(function($file)
-        {
-            return str_replace('.php', '', ($file));
+        if (count($files) == 0) {
+            pc('Nothing to seed.');
+        } else {
+            $files = array_map(function($file)
+            {
+                return str_replace('.php', '', ($file));
 
-        }, $files);
+            }, $files);
 
-        // Once we have all of the formatted file names we will sort them and since
-        // they all start with a timestamp this should give us the migrations in
-        // the order they were actually created by the application developers.
-        sort($files);
+            // Once we have all of the formatted file names we will sort them and since
+            // they all start with a timestamp this should give us the migrations in
+            // the order they were actually created by the application developers.
+            sort($files);
+        }
 
         return $files;
     }
