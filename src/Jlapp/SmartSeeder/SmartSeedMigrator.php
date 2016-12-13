@@ -293,7 +293,6 @@ class SmartSeedMigrator extends Migrator {
 
         /*pc ($files);
         pc ($ran_files);
-
         pc($file_path);*/
 
         // filter all seeder by their filename only;

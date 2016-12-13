@@ -42,7 +42,7 @@ class SeedCoreCommand extends Command {
      */
     public function fire()
     {
-        pc('run core seed');
+        pc('Running the core seed for client');
 
         if ( ! $this->confirmToProceed()) return;
 
@@ -61,10 +61,9 @@ class SeedCoreCommand extends Command {
         $client = $this->option('client-name');
         $env = $client;
         $this->migrator->setEnv($env);
-        // Set the Seed Type;
-        //$this->migrator->setSeedType('core');
 
-        //pc($path, 1);
+        // Set the Seed Type;
+        $this->migrator->setSeedType('core');
 
         $single = $this->option('file');
         if ($single) {
