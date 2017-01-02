@@ -64,7 +64,12 @@ class SmartSeederRepository implements SmartSeederRepositoryInterface
         if (empty($env)) {
             $env = App::environment();
         }
-        return $this->table()->where(self::envVar, '=', $env)->lists('seed');
+
+        return $this->table()
+            ->where(self::envVar, '=', $env)
+            ->orderBy('batch', 'asc')
+            ->orderBy('seed', 'asc')
+            ->pluck('seed')->all();
     }
 
     public function getMigrations($steps)
@@ -251,6 +256,13 @@ class SmartSeederRepository implements SmartSeederRepositoryInterface
      */
     public function getConnection()
     {
+        if (empty($this->connection)) {
+            $name = 'cli'; // that's the default system connection
+            $name = ( !in_array($name, config('database.connections') ) ) ? $name : config('database.default');
+
+            $this->connection = $name;
+        }
+
         return $this->resolver->connection($this->connection);
     }
 }
