@@ -32,6 +32,7 @@ class SeedCoreCommand extends Command {
 
     public function __construct(SmartSeedMigrator $migrator) {
         parent::__construct();
+
         $this->migrator = $migrator;
     }
 
@@ -66,11 +67,14 @@ class SeedCoreCommand extends Command {
         $this->migrator->setSeedType('core');
 
         $single = $this->option('file');
+
         if ($single) {
             $this->migrator->runSingleFile("$path/$single", $pretend);
         }
         else {
-            $this->migrator->run($path, $pretend);
+            $this->migrator->run([$path],
+                ['pretend' => $pretend]
+            );
         }
 
         // Once the migrator has run we will grab the note output and send it out to
@@ -91,6 +95,8 @@ class SeedCoreCommand extends Command {
     {
         $this->migrator->setConnection($this->input->getOption('database'));
 
+        $connection = $this->migrator->getConnection();
+
         if ( ! $this->migrator->repositoryExists())
         {
             $options = array('--database' => $this->input->getOption('database'));
@@ -109,7 +115,6 @@ class SeedCoreCommand extends Command {
     {
         return array(
             array('client-name', null, InputOption::VALUE_OPTIONAL, 'The client for which to run the seeds.', null),
-            array('envi', null, InputOption::VALUE_REQUIRED, 'The database environment for connection to use.'),
             array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'),
             array('file', null, InputOption::VALUE_OPTIONAL, 'Allows individual seed files to be run.', null),
 

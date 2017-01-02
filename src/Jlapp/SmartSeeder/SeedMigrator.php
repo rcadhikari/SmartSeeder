@@ -154,6 +154,8 @@ class SeedMigrator extends Migrator {
      */
     protected function runDown($seed, $pretend)
     {
+        pc($seed, 1);
+
         $file = basename($seed->seed);
 
         // First we will get the file name of the migration so we can resolve out an

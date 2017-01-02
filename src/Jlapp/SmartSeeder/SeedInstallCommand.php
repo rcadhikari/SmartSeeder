@@ -10,7 +10,6 @@ namespace Jlapp\SmartSeeder;
 
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
-use Illuminate\Support\Facades\App;
 
 class SeedInstallCommand extends Command {
     /**
@@ -39,11 +38,9 @@ class SeedInstallCommand extends Command {
 
     public function __construct(
         SmartSeederRepository $repository
-        //SmartSeederFilesRepository $repository_files
     ) {
         parent::__construct();
         $this->repository = $repository;
-        //$this->repository_files = $repository_files;
     }
     /**
      * Execute the console command.
@@ -53,6 +50,7 @@ class SeedInstallCommand extends Command {
     public function fire()
     {
         $this->repository->setSource($this->input->getOption('database'));
+
         $result = $this->repository->createRepository();
 
         $message = (!$result) ? 'already exist' : 'created successfully';

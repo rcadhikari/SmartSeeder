@@ -10,6 +10,8 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 
 class SmartSeeder extends Seeder
 {
+    public $connection;
+
     /**
      * The container instance.
      *
@@ -151,4 +153,14 @@ class SmartSeeder extends Seeder
 
         return $text;
     }
+
+    /**
+     * @return \Illuminate\Console\OutputStyle
+     */
+    public function getConnection()
+    {
+        return $this->connection;
+    }
+
+
 }

@@ -1,6 +1,6 @@
 <?php namespace Jlapp\SmartSeeder;
 
-use Jlapp\SmartSeeder\SmartSeeder;
+#use Jlapp\SmartSeeder\SmartSeeder;
 use Maatwebsite\Excel\Facades\Excel;
 
 class SmartSeederImportCsv extends SmartSeeder
@@ -77,6 +77,8 @@ class SmartSeederImportCsv extends SmartSeeder
 
     private function convertToAssociativeArray($keys, $data)
     {
+        //pc($keys);pc($data);
+
         $assoc = [];
         foreach($data as $row)
         {
@@ -177,7 +179,8 @@ class SmartSeederImportCsv extends SmartSeeder
 
     private function updateCounters($record)
     {
-        if ($record->exists) {
+        $isExist = isset($record->id) && !empty($record->id) ? true : false;
+        if ($isExist) {
             $this->counters['existing']++;
         } else
         {
@@ -199,4 +202,8 @@ class SmartSeederImportCsv extends SmartSeeder
 
     protected function insertCallBack($record, $row) {}
 
+    public function getConnection()
+    {
+        return $this->connection;
+    }
 }
