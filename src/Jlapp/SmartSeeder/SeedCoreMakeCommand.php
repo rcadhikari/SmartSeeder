@@ -34,17 +34,64 @@ class SeedCoreMakeCommand extends Command {
      */
     public function fire()
     {
+        $seed_type = $this->option('type');
+
+        if ($seed_type == "csv") {
+            $this->create_seeder_for_csv($seed_type);
+        } else {
+            $this->create_seeder();
+        }
+    }
+
+    private function create_seeder_for_csv($seed_type)
+    {
+        $file_path= client_path(config('smart-seeder.coreSeedFileDir'));
+        $data_path = config('smart-seeder.dataFileDir');
+        $seed_file = $this->argument('seed');
+        $extension = $seed_type;
+
+        $model = ucfirst(camel_case($seed_file));
+
+        $path = $file_path;
+        $data_path = $path . $data_path;
+
+        if (!File::exists($data_path)) {
+            // mode 0755 is based on the default mode Laravel use.
+            File::makeDirectory($data_path, 755, true);
+        }
+
+        $created = date('Y_m_d_His');
+        $table = snake_case($model);
+        $path .= DIRECTORY_SEPARATOR."{$created}_{$table}_seeder.php";
+        $seedDataFile = "{$table}.$extension";
+
+        $data_path .= DIRECTORY_SEPARATOR.$seedDataFile;
+
+        // Creating Seeder file
+        $fs = File::get(__DIR__.DIRECTORY_SEPARATOR."stubs".DIRECTORY_SEPARATOR."CoreSeederCsv.stub");
+
+        $eloquentModel = substr($model, 0,-1);
+        $model = "{$model}Seeder_{$created}";
+
+        $namespace = rtrim($this->getAppNamespace(), "\\");
+        $stub = str_replace('{{model}}', $model, $fs);
+        $stub = str_replace('{{eloquentModel}}', $eloquentModel, $stub);
+        $stub = str_replace('{{seedDataFile}}', $seedDataFile, $stub);
+        File::put($path, $stub);
+
+        // Creating Seeder Data file
+        $stub = "";
+        File::put($data_path, $stub);
+
+        $this->line("Seeder class <info>$model</info> and data file <info>$seedDataFile</info> created for a Core");
+    }
+
+    private function create_seeder()
+    {
         $file_path= client_path(config('smart-seeder.coreSeedFileDir'));
         $data_path = config('smart-seeder.dataFileDir');
         $seed_file = $this->argument('seed');
 
-        // Return the error message if no extension found.
-        /*if (strpos($seed_file, '.') === false) {
-            $this->line("\nPlease enter the seed(seed file) <info>extension</info>.");dd();
-        }
-        // To remove the seed file extension.
-        $seed_name = substr($seed_file,0, strpos($seed_file, '.'));
-        */
         $model = ucfirst(camel_case($seed_file));
 
         $path = $file_path;
@@ -106,7 +153,7 @@ class SeedCoreMakeCommand extends Command {
     {
         return array(
             array('seed', null, InputOption::VALUE_REQUIRED, 'The name of the model you wish to seed.', null),
-            //array('seed', null, InputOption::VALUE_REQUIRED, 'The  name to seed to.', null),
+            array('type', null, InputOption::VALUE_OPTIONAL, 'Type of seeder file to be imported', null),
             //array('seeder-path', null, InputOption::VALUE_OPTIONAL, 'The relative path to the base path to generate the seed to.', null),
         );
     }

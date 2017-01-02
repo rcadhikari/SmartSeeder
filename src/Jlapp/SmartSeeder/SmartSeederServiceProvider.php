@@ -30,7 +30,7 @@ class SmartSeederServiceProvider extends ServiceProvider {
             __DIR__.'/../../config/smart-seeder.php', 'smart-seeder'
         );
 
-        App::bindShared('seed.repository', function($app) {
+        $this->app->singleton('seed.repository', function($app) {
             return new SmartSeederRepository(
                 $app['db'],
                 config('smart-seeder.seedTable') // for seeder table
@@ -38,19 +38,19 @@ class SmartSeederServiceProvider extends ServiceProvider {
         });
 
         // For creating the seed_file table.
-        /*App::bindShared('seed.repository_files', function($app) {
+        /*$this->app->singleton('seed.repository_files', function($app) {
             return new SmartSeederFilesRepository(
                 $app['db'],
                 config('smart-seeder.ClientSeedFileTable') // for seeder files table;
             );
         });*/
 
-        App::bindShared('seed.migrator', function($app)
+        $this->app->singleton('seed.migrator', function($app)
         {
             return new SeedMigrator($app['seed.repository'], $app['db'], $app['files']);
         });
 
-        /*App::bindShared('seed.default-migrator', function($app)
+        /*$this->app->singleton('seed.default-migrator', function($app)
         {
             return new SeedMigrator($app['seed.repository'], $app['db'], $app['files']);
         });*/
@@ -93,7 +93,7 @@ class SmartSeederServiceProvider extends ServiceProvider {
             return new SeedRefreshCommand();
         });
 
-        App::bindShared('seed.smart_migrator', function($app)
+        $this->app->singleton('seed.smart_migrator', function($app)
         {
             return new SmartSeedMigrator($app['seed.repository'], $app['db'], $app['files']);
         });
