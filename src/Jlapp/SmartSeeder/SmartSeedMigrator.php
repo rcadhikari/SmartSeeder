@@ -91,7 +91,13 @@ class SmartSeedMigrator extends Migrator {
         return $files;
     }
 
-    public function requireFiles($path, array $files)
+    /**
+     * Require in all the migration files in a given path.
+     *
+     * @param  array   $files
+     * @return void
+     */
+    public function requireFiles(array $files)
     {
         foreach ($files as $file) {
             $this->files->requireOnce($file.'.php');
@@ -195,7 +201,30 @@ class SmartSeedMigrator extends Migrator {
      * @param  bool    $pretend
      * @return void
      */
-    protected function runDown($seed, $pretend)
+    protected function runDown($file, $migration, $pretend)
+    {
+        $file = $this->getMigrationName($file);
+
+        // First we will get the file name of the migration so we can resolve out an
+        // instance of the migration. Once we get an instance we can either run a
+        // pretend execution of the migration or we can run the real migration.
+        $instance = $this->resolve($file);
+
+        if ($pretend) {
+            return $this->pretendToRun($instance, 'down');
+        }
+
+        $this->runMigration($instance, 'down');
+
+        // Once we have successfully run the migration "down" we will remove it from
+        // the migration repository so it will be considered to have not been run
+        // by the application then will be able to fire by any later operation.
+        $this->repository->delete($migration);
+
+        $this->note("<info>Rolled back:</info> {$file}");
+    }
+
+    protected function runDown3($seed, $pretend)
     {
         $fileName = basename($seed->seed);
 

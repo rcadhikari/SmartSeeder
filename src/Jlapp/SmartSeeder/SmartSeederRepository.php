@@ -1,48 +1,45 @@
 <?php namespace Jlapp\SmartSeeder;
 
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
-use Illuminate\Database\Migrations\MigrationRepositoryInterface;
 use Illuminate\Database\Schema\Blueprint;
 use App;
 
-class SmartSeederRepository implements MigrationRepositoryInterface {
-
+class SmartSeederRepository implements SmartSeederRepositoryInterface
+{
     /**
      * The database connection resolver instance.
      *
      * @var \Illuminate\Database\ConnectionResolverInterface
      */
-    protected $resolver;
+    var $resolver;
 
     /**
      * The name of the migration table.
      *
      * @var string
      */
-    protected $table;
+    var $table;
 
     /**
      * The name of the database connection to use.
      *
      * @var string
      */
-    protected $connection;
+    var $connection;
 
     /**
      * The name of the environment to run in
      *
      * @var string
      */
-    public $env;
+    var $env;
 
     /**
      * The name of the seeder type to run for
      *
      * @var string
      */
-    public $seedType;
-
-    const envVar = 'client';
+    var $seedType;
 
     /**
      * Create a new database migration repository instance.
@@ -57,24 +54,6 @@ class SmartSeederRepository implements MigrationRepositoryInterface {
     }
 
     /**
-     * Set the environment to run the seeds against
-     *
-     * @param $env
-     */
-    public function setEnv($env) {
-        $this->env = $env;
-    }
-
-    /**
-     * Set the environment to run the seeds against
-     *
-     * @param $env
-     */
-    public function setSeedType($seedType) {
-        $this->seedType = $seedType;
-    }
-
-    /**
      * Get the ran migrations.
      *
      * @return array
@@ -86,6 +65,11 @@ class SmartSeederRepository implements MigrationRepositoryInterface {
             $env = App::environment();
         }
         return $this->table()->where(self::envVar, '=', $env)->lists('seed');
+    }
+
+    public function getMigrations($steps)
+    {
+        $this->getMigrations($steps);
     }
 
     /**
@@ -150,20 +134,6 @@ class SmartSeederRepository implements MigrationRepositoryInterface {
     }
 
     /**
-     * Get the last migration batch number.
-     *
-     * @return int
-     */
-    public function getLastBatchNumber()
-    {
-        $env = $this->env;
-        if (empty($env)) {
-            $env = App::environment();
-        }
-        return $this->table()->where('client', '=', $env)->max('batch');
-    }
-
-    /**
      * Create the migration repository data store.
      *
      * @return void
@@ -202,11 +172,64 @@ class SmartSeederRepository implements MigrationRepositoryInterface {
     }
 
     /**
+     * Set the information source to gather data.
+     *
+     * @param  string  $name
+     * @return void
+     */
+    public function setSource($name)
+    {
+        $this->connection = $name;
+    }
+
+    /**
+     * Set the environment to run the seeds against
+     *
+     * @param $env
+     */
+    public function setEnv($env) {
+        $this->env = $env;
+    }
+
+    /**
+     * Set the environment to run the seeds against
+     *
+     * @param $env
+     */
+    public function getEnv()
+    {
+        return $this->env;
+    }
+
+    /**
+     * Set the environment to run the seeds against
+     *
+     * @param $env
+     */
+    public function setSeedType($seedType) {
+        $this->seedType = $seedType;
+    }
+
+    /**
+     * Get the last migration batch number.
+     *
+     * @return int
+     */
+    public function getLastBatchNumber()
+    {
+        $env = $this->env;
+        if (empty($env)) {
+            $env = App::environment();
+        }
+        return $this->table()->where('client', '=', $env)->max('batch');
+    }
+
+    /**
      * Get a query builder for the migration table.
      *
      * @return \Illuminate\Database\Query\Builder
      */
-    protected function table()
+    public function table()
     {
         return $this->getConnection()->table($this->table);
     }
@@ -230,16 +253,4 @@ class SmartSeederRepository implements MigrationRepositoryInterface {
     {
         return $this->resolver->connection($this->connection);
     }
-
-    /**
-     * Set the information source to gather data.
-     *
-     * @param  string  $name
-     * @return void
-     */
-    public function setSource($name)
-    {
-        $this->connection = $name;
-    }
-
 }

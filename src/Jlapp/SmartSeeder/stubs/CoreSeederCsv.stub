@@ -1,0 +1,20 @@
+<?php
+use Jlapp\SmartSeeder\SmartSeederImportCsv;
+
+class {{model}} extends SmartSeederImportCsv
+{
+    protected $seed = __DIR__ . '/data/{{seedDataFile}}';
+
+    protected $model = 'App\Models\{{eloquentModel}}';
+
+    protected $header = true;
+
+    protected $unique = [
+        'name'
+    ];
+
+    protected $columns = [
+        'name',
+        'level'
+    ];
+}
