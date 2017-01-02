@@ -1,0 +1,47 @@
+<?php {{namespace}}
+
+use Illuminate\Support\Facades\DB;
+use Jlapp\SmartSeeder\SeederProgressBarTrait;
+use Jlapp\SmartSeeder\SmartSeeder;
+use App\Models\{{eloquentModel}};
+
+class {{model}} extends SmartSeeder
+{
+    use SeederProgressBarTrait;
+
+    protected $seedFilePath;
+
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
+    public function run()
+    {
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        DB::table('{{table}}')->delete();
+
+        $this->seedFilePath = __DIR__ . '/data/{{seed_file}}';
+
+        $progress = $this->createProgressBar();
+
+        $counter = (count(file($this->seedFilePath)) - 1); // Adding the number of rows of seed file
+        $progress->start($counter);
+
+        // Include the import data seed functionality
+        $this->getImportSeedData($progress);
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        $progress->finish();
+    }
+
+    /**
+     * Write the seed file import functionality here...
+     */
+    protected function getImportSeedData($progress=null)
+    {
+        // codes
+        //$progress->advance(); // you can ignore this line
+    }
+
+}

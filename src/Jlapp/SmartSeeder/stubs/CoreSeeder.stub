@@ -1,0 +1,63 @@
+<?php {{namespace}}
+
+use Illuminate\Database\Eloquent\Model;
+use Jlapp\SmartSeeder\SmartSeeder;
+use Jlapp\SmartSeeder\SeederProgressBarTrait;
+use App\Models\{{eloquentModel}};
+use DB;
+
+class {{model}} extends SmartSeeder
+{
+    use SeederProgressBarTrait;
+
+    protected $structure = [
+        0 => 'id',
+    ];
+
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
+    public function run()
+    {
+        DB::table('{{table}}')->delete();
+
+        $progress = $this->createProgressBar();
+
+        $data = include(__DIR__ . '/data/{{seedDataFile}}');
+        //$this->command->line('<info>Inserting data:</info> {{table}}';
+        $counter = count($data); // Adding the number of rows of seed file
+        $progress->start($counter);
+
+        $dataArray = [];
+        foreach($data as $row) {
+            array_push($dataArray, $this->create($row));
+            $progress->advance();
+        }
+
+        if(count($dataArray) >= 2500)
+        {
+            $multiDataArray = array_chunk($dataArray, 2500);
+            foreach($multiDataArray as $arrayChunk)
+            {
+                {{eloquentModel}}::insert($arrayChunk);
+            }
+        }
+        else{
+            {{eloquentModel}}::insert($dataArray);
+        }
+        $progress->finish();
+    }
+
+    protected function create($values)
+    {
+        $data = [];
+        foreach ($this->structure as $i => $key) {
+            $data[$key] = $values[$i];
+        }
+        return $data;
+
+    }
+
+}

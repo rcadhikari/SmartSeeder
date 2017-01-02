@@ -36,6 +36,15 @@ class SmartSeederRepository implements MigrationRepositoryInterface {
     public $env;
 
     /**
+     * The name of the seeder type to run for
+     *
+     * @var string
+     */
+    public $seedType;
+
+    const envVar = 'client';
+
+    /**
      * Create a new database migration repository instance.
      *
      * @param  \Illuminate\Database\ConnectionResolverInterface $resolver
@@ -57,6 +66,15 @@ class SmartSeederRepository implements MigrationRepositoryInterface {
     }
 
     /**
+     * Set the environment to run the seeds against
+     *
+     * @param $env
+     */
+    public function setSeedType($seedType) {
+        $this->seedType = $seedType;
+    }
+
+    /**
      * Get the ran migrations.
      *
      * @return array
@@ -67,7 +85,7 @@ class SmartSeederRepository implements MigrationRepositoryInterface {
         if (empty($env)) {
             $env = App::environment();
         }
-        return $this->table()->where('env', '=', $env)->lists('seed');
+        return $this->table()->where(self::envVar, '=', $env)->lists('seed');
     }
 
     /**
@@ -82,7 +100,7 @@ class SmartSeederRepository implements MigrationRepositoryInterface {
             $env = App::environment();
         }
 
-        $query = $this->table()->where('env', '=', $env)->where('batch', $this->getLastBatchNumber());
+        $query = $this->table()->where(self::envVar, '=', $env)->where('batch', $this->getLastBatchNumber());
 
         return $query->orderBy('seed', 'desc')->get();
     }
@@ -100,7 +118,7 @@ class SmartSeederRepository implements MigrationRepositoryInterface {
         if (empty($env)) {
             $env = App::environment();
         }
-        $record = array('seed' => $file, 'env' => $env, 'batch' => $batch);
+        $record = array('seed' => $file, self::envVar => $env, 'batch' => $batch);
 
         $this->table()->insert($record);
     }
@@ -118,7 +136,7 @@ class SmartSeederRepository implements MigrationRepositoryInterface {
         if (empty($env)) {
             $env = App::environment();
         }
-        $this->table()->where('env', '=', $env)->where('seed', $seed->seed)->delete();
+        $this->table()->where(self::envVar, '=', $env)->where('seed', $seed->seed)->delete();
     }
 
     /**
@@ -142,7 +160,7 @@ class SmartSeederRepository implements MigrationRepositoryInterface {
         if (empty($env)) {
             $env = App::environment();
         }
-        return $this->table()->where('env', '=', $env)->max('batch');
+        return $this->table()->where('client', '=', $env)->max('batch');
     }
 
     /**
@@ -154,16 +172,21 @@ class SmartSeederRepository implements MigrationRepositoryInterface {
     {
         $schema = $this->getConnection()->getSchemaBuilder();
 
+        if ($schema->hasTable($this->table)) {
+            return false;
+        }
+
         $schema->create($this->table, function(Blueprint $table)
         {
             // The migrations table is responsible for keeping track of which of the
             // migrations have actually run for the application. We'll create the
             // table to hold the migration file's path as well as the batch ID.
             $table->string('seed');
-            $table->string('env');
-
+            $table->string('client');
             $table->integer('batch');
         });
+
+        return true;
     }
 
     /**

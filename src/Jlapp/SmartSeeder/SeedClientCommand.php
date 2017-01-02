@@ -5,9 +5,9 @@ use Symfony\Component\Console\Input\InputOption;
 use Illuminate\Support\Facades\App;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Support\Facades\Config;
-use Jlapp\SmartSeeder\SeedMigrator;
+use Jlapp\SmartSeeder\SmartSeedMigrator;
 
-class SeedCommand extends Command {
+class SeedClientCommand extends Command {
 
     use ConfirmableTrait;
     /**
@@ -15,22 +15,26 @@ class SeedCommand extends Command {
      *
      * @var string
      */
-    protected $name = 'seed:run';
+    protected $name = 'seed:client:run';
 
     private $migrator;
+
+    protected $command;
+
+    protected $output;
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Seeds the database';
+    protected $description = 'Seeds the client data files';
 
-
-    public function __construct(SeedMigrator $migrator) {
+    public function __construct(SmartSeedMigrator $migrator) {
         parent::__construct();
         $this->migrator = $migrator;
     }
+
     /**
      * Execute the console command.
      *
@@ -47,16 +51,22 @@ class SeedCommand extends Command {
         // a database for real, which is helpful for double checking migrations.
         $pretend = $this->input->getOption('pretend');
 
-        $path = database_path(config('smart-seeder.seedDir'));
-        $env = $this->option('client');
+        $path = client_path(config('smart-seeder.clientSeedDir'));
+        $file_path= client_path(config('smart-seeder.clientSeedFileDir'));
+        $client = $this->option('client-name');
+        $file_path = str_replace('{client}', $client, $file_path);
 
+        $env = $client;
         $this->migrator->setEnv($env);
+        // Set the Seed Type as 'client';
+        $this->migrator->setSeedType('client');
 
         $single = $this->option('file');
         if ($single) {
-            $this->migrator->runSingleFile("$path/$single", $pretend);
-        } else {
-            $this->migrator->run($path, $pretend);
+            $this->migrator->runSingleFile("$file_path/$single", $pretend);
+        }
+        else {
+            $this->migrator->run($file_path, $pretend);
         }
 
         // Once the migrator has run we will grab the note output and send it out to
@@ -85,7 +95,6 @@ class SeedCommand extends Command {
         }
     }
 
-
     /**
      * Get the console command options.
      *
@@ -94,7 +103,7 @@ class SeedCommand extends Command {
     protected function getOptions()
     {
         return array(
-            array('client', null, InputOption::VALUE_OPTIONAL, 'The client for which to run the seeds.', null),
+            array('client-name', null, InputOption::VALUE_OPTIONAL, 'The client for which to run the seeds.', null),
             array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'),
             array('file', null, InputOption::VALUE_OPTIONAL, 'Allows individual seed files to be run.', null),
 

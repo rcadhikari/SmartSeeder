@@ -1,6 +1,7 @@
 <?php
 namespace Jlapp\SmartSeeder;
 
+use Illuminate\Console\Command;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Console\AppNamespaceDetectorTrait;
@@ -9,9 +10,11 @@ use Config;
 use File;
 use App;
 
-class SeedMigrator extends Migrator {
+class SmartSeedMigrator extends Migrator {
 
     use AppNamespaceDetectorTrait;
+
+    protected $client;
 
     /**
      * Create a new migrator instance.
@@ -32,6 +35,20 @@ class SeedMigrator extends Migrator {
         $this->repository->setEnv($env);
     }
 
+    public function setSeedType($seedType) {
+        $this->repository->setSeedType($seedType);
+    }
+
+    public function setClient($client)
+    {
+        $this->client = $client;
+    }
+
+    public function getClient()
+    {
+        return $this->client;
+    }
+
     /**
      * Get all of the migration files in a given path.
      *
@@ -40,11 +57,12 @@ class SeedMigrator extends Migrator {
      */
     public function getMigrationFiles($path)
     {
+        $data_path = $path.config('smart-seeder.dataFileDir');
+
         $files = [];
         if (!empty($this->repository->env)) {
             $files = array_merge($files, $this->files->glob("$path/{$this->repository->env}/*.php"));
         }
-
         $files = array_merge($files, $this->files->glob($path.'/*.php'));
 
         // Once we have the array of files in the directory we will just remove the
@@ -52,16 +70,23 @@ class SeedMigrator extends Migrator {
         // finding the migrations that haven't been run against the databases.
         if ($files === false) return array();
 
-        $files = array_map(function($file)
-        {
-            return str_replace('.php', '', ($file));
+        // Filter only New Seeders only
+        $files = $this->getFilterNewSeedersOnly($files);
 
-        }, $files);
+        if (count($files) == 0) {
+            pc('Nothing to seed.');
+        } else {
+            $files = array_map(function($file)
+            {
+                return str_replace('.php', '', ($file));
 
-        // Once we have all of the formatted file names we will sort them and since
-        // they all start with a timestamp this should give us the migrations in
-        // the order they were actually created by the application developers.
-        sort($files);
+            }, $files);
+
+            // Once we have all of the formatted file names we will sort them and since
+            // they all start with a timestamp this should give us the migrations in
+            // the order they were actually created by the application developers.
+            sort($files);
+        }
 
         return $files;
     }
@@ -109,9 +134,19 @@ class SeedMigrator extends Migrator {
         if (!$filename_ext) {
             $path .= ".php";
         }
+        $filename = basename($file);
+        $className = $this->getClassNameFromFileName($filename);
+        $fullPath = $this->getAppNamespace().$className;
         $this->files->requireOnce($path);
 
         $this->runMigrationList($migrations, $pretend);
+    }
+
+    public function setCommand(Command $command)
+    {
+        $this->command = parent::setCommand($this);
+
+        return $this;
     }
 
     /**
@@ -127,8 +162,16 @@ class SeedMigrator extends Migrator {
         // First we will resolve a "real" instance of the migration class from this
         // migration file name. Once we have the instances we can run the actual
         // command such as "up" or "down", or we can just simulate the action.
-        $fullPath = $this->getAppNamespace().basename($file);
-        $migration = new $fullPath();
+        $filename = basename($file);
+        $className = $this->getClassNameFromFileName($filename);
+        $fullPath = $this->getAppNamespace().$className;
+
+        if(!class_exists($fullPath))
+        {
+            $fullPath = $className;
+        }
+
+        $migration = new $fullPath( new Command($this) );
 
         if ($pretend)
         {
@@ -140,9 +183,9 @@ class SeedMigrator extends Migrator {
         // Once we have run a migrations class, we will log that it was run in this
         // repository so that we don't try to run it next time we do a migration
         // in the application. A migration repository keeps the migrate order.
-        $this->repository->log($file, $batch);
+        $this->repository->log($filename, $batch);
 
-        $this->note("<info>Seeded:</info> $file");
+        $this->note("<info>Seeded:</info> $filename");
     }
 
     /**
@@ -154,12 +197,12 @@ class SeedMigrator extends Migrator {
      */
     protected function runDown($seed, $pretend)
     {
-        $file = basename($seed->seed);
+        $fileName = basename($seed->seed);
 
         // First we will get the file name of the migration so we can resolve out an
         // instance of the migration. Once we get an instance we can either run a
         // pretend execution of the migration or we can run the real migration.
-        $instance = $this->resolve($file);
+        $instance = $this->resolve($fileName);
 
         if ($pretend)
         {
@@ -175,7 +218,7 @@ class SeedMigrator extends Migrator {
         // by the application then will be able to fire by any later operation.
         $this->repository->delete($seed);
 
-        $this->note("<info>Rolled back:</info> $file");
+        $this->note("<info>Rolled back:</info> $fileName");
     }
 
     /**
@@ -184,14 +227,87 @@ class SeedMigrator extends Migrator {
      * @param  string  $file
      * @return object
      */
-    public function resolve($filePath)
+    public function resolve($fileName)
     {
+        $client = $this->getClient();
+        $file_path = client_path(config('smart-seeder.seedFileDir'));
+        $file_path = str_replace('{client}', $client, $file_path);
+
+        $filePath = $file_path.DIRECTORY_SEPARATOR.$fileName.'.php';
+
         if (File::exists($filePath)) {
             require_once $filePath;
+        } else {
+            return false;
         }
 
-        $fullPath = $this->getAppNamespace().$filePath;
+        $fullPath = $this->getAppNamespace().$this->getClassNameFromFileName($fileName);
 
         return new $fullPath;
+    }
+
+    private function getClassNameFromFileName($filename)
+    {
+
+        $timestamp = substr($filename, 0, 17);
+        if(preg_match('/\d{4}_\d{2}_\d{2}_\d{6}/',trim($timestamp))) {
+            $output = ucfirst(camel_case(substr($filename, 18)));
+            $output .= '_' . $timestamp;
+        }
+        else{
+            $output=$filename;
+        }
+        return $output;
+    }
+
+    /**
+     * This function will parse all the existing seeders for the client.
+     * - it will also get all the already ran seeders from database.
+     * - then, it only filter the difference and return only new seeder files.
+     *
+     * @param array $files
+     * @return array
+     */
+    private function getFilterNewSeedersOnly($files=[])
+    {
+        // This is the list of all seeder class which exist for the client
+        $all_seeders = $files;
+
+        // Get the list of ran files
+        $ran_files = $this->repository->getRan();
+
+        $client = $this->repository->env;
+        $seedType = $this->repository->seedType;
+
+        if ($seedType === 'client') {
+            $file_path = client_path(config('smart-seeder.clientSeedFileDir'));
+            $file_path = str_replace('{client}', $client, $file_path);
+        }
+        else if ($seedType === 'master') {
+            $file_path = client_path(config('smart-seeder.masterSeedFileDir'));
+        }
+        else {
+            // Seeding for core;
+            $file_path = client_path(config('smart-seeder.coreSeedFileDir'));
+        }
+
+        /*pc ($files);
+        pc ($ran_files);
+        pc($file_path);*/
+
+        // filter all seeder by their filename only;
+        $all_seeders_files = [];
+        foreach ($all_seeders as $file) {
+            $filename = str_replace($file_path.'/', '', $file);
+            $filename = str_replace('.php', '', $filename);
+            $filename = trim($filename);
+
+            // only add which is not in a ran files list.
+            if (!in_array($filename, $ran_files)) {
+                $all_seeders_files[] = $file;
+            }
+        }
+
+        return $all_seeders_files;
     }
 } 

@@ -1,0 +1,41 @@
+<?php {{namespace}}
+
+use Illuminate\Database\Eloquent\Model;
+use Jlapp\SmartSeeder\SmartSeeder;
+use DB;
+
+class {{model}} extends SmartSeeder
+{
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
+    public function run()
+    {
+        Model::unguard();
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        $seedFilePath = __DIR__ . '/data/{{seed_file}}';
+
+        $params = [
+            'counter' => (count(file($seedFilePath)) - 1), // Adding the number of rows of seed file
+            'filePath' => $seedFilePath
+        ];
+        $this->call('{{calls}}', $params);
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+    }
+
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Model::unguard();
+
+    }
+
+}

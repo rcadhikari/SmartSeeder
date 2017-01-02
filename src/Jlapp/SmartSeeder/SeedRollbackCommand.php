@@ -68,6 +68,30 @@ class SeedRollbackCommand extends Command {
         }
     }
 
+    public function fire_w()
+    {
+        if ( ! $this->confirmToProceed()) return;
+
+        $this->migrator->setConnection($this->input->getOption('database'));
+
+        $env = $this->option('env');
+
+        if (File::exists(database_path(config('smart-seeder.seedsDir')))) {
+            $this->migrator->setEnv($env);
+        }
+
+        $pretend = $this->input->getOption('pretend');
+        $this->migrator->rollback($pretend);
+
+        // Once the migrator has run we will grab the note output and send it out to
+        // the console screen, since the migrator itself functions without having
+        // any instances of the OutputInterface contract passed into the class.
+        foreach ($this->migrator->getNotes() as $note)
+        {
+            $this->output->writeln($note);
+        }
+    }
+
     /**
      * Get the console command arguments.
      *

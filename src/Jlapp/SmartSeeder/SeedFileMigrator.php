@@ -9,7 +9,7 @@ use Config;
 use File;
 use App;
 
-class SeedMigrator extends Migrator {
+class SeedFileMigrator extends Migrator {
 
     use AppNamespaceDetectorTrait;
 
@@ -128,6 +128,10 @@ class SeedMigrator extends Migrator {
         // migration file name. Once we have the instances we can run the actual
         // command such as "up" or "down", or we can just simulate the action.
         $fullPath = $this->getAppNamespace().basename($file);
+        if(!class_exists($fullPath)) {
+            $fullPath = ucfirst(basename($file));
+        }
+
         $migration = new $fullPath();
 
         if ($pretend)

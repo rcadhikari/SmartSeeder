@@ -16,7 +16,7 @@ class Seeder extends Eloquent {
 
     protected $fillable = [
         'seed',
-        'env',
+        'client', //'env',
         'batch'
     ];
 }
