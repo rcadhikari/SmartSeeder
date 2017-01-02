@@ -32,6 +32,7 @@ class SeedCoreCommand extends Command {
 
     public function __construct(SmartSeedMigrator $migrator) {
         parent::__construct();
+
         $this->migrator = $migrator;
     }
 
@@ -66,11 +67,14 @@ class SeedCoreCommand extends Command {
         $this->migrator->setSeedType('core');
 
         $single = $this->option('file');
+
         if ($single) {
             $this->migrator->runSingleFile("$path/$single", $pretend);
         }
         else {
-            $this->migrator->run($path, $pretend);
+            $this->migrator->run([$path],
+                ['pretend' => $pretend]
+            );
         }
 
         // Once the migrator has run we will grab the note output and send it out to
@@ -90,6 +94,8 @@ class SeedCoreCommand extends Command {
     protected function prepareDatabase()
     {
         $this->migrator->setConnection($this->input->getOption('database'));
+
+        $connection = $this->migrator->getConnection();
 
         if ( ! $this->migrator->repositoryExists())
         {
