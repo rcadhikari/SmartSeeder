@@ -20,7 +20,9 @@
     "illuminate/support": "5.3.*",
     "illuminate/console": "5.3.*",
     "illuminate/database": "5.3.*",
-    "illuminate/filesystem": "5.3.*"
+    "illuminate/filesystem": "5.3.*",
+    "illuminate/html": "5.*",
+    "maatwebsite/excel": "^2.1"
   },
   "require-dev": {
     "phpspec/phpspec": "^3.0",
