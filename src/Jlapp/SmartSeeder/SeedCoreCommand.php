@@ -115,7 +115,6 @@ class SeedCoreCommand extends Command {
     {
         return array(
             array('client-name', null, InputOption::VALUE_OPTIONAL, 'The client for which to run the seeds.', null),
-            array('envi', null, InputOption::VALUE_REQUIRED, 'The database environment for connection to use.'),
             array('database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'),
             array('file', null, InputOption::VALUE_OPTIONAL, 'Allows individual seed files to be run.', null),
 

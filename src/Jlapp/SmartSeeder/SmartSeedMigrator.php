@@ -576,13 +576,7 @@ class SmartSeedMigrator extends Migrator {
 
     public function getConnection()
     {
-        $name = config('database.default');
-
-        if (empty($this->connection)) {
-            $this->connection = $name;
-        }
-
-        return $this->connection;
+        return $this->connection = $this->repository->getConnection();
     }
 
     public function setEnv($env) {
@@ -614,8 +608,6 @@ class SmartSeedMigrator extends Migrator {
         $client = $this->getClient();
         $file_path = client_path(config('smart-seeder.seedFileDir'));
         $file_path = str_replace('{client}', $client, $file_path);
-
-        pc($fileName, 1);
 
         $filePath = $file_path.DIRECTORY_SEPARATOR.$fileName.'.php';
 
@@ -696,5 +688,40 @@ class SmartSeedMigrator extends Migrator {
         }
 
         return $all_seeders_files;
+    }
+
+    /**
+     * Run the outstanding migrations at a given path.
+     *
+     * @param  string  $path
+     * @param  bool    $pretend
+     * @return void
+     */
+    public function runSingleFile($path, $pretend = false)
+    {
+        $this->notes = array();
+
+        $file = str_replace('.php', '', basename($path));
+
+        $files = [$file];
+
+        // Once we grab all of the migration files for the path, we will compare them
+        // against the migrations that have already been run for this package then
+        // run each of the outstanding migrations against a database connection.
+        $ran = $this->repository->getRan();
+
+        $migrations = array_diff($files, $ran);
+
+        $filename_ext = pathinfo($path, PATHINFO_EXTENSION);
+
+        if (!$filename_ext) {
+            $path .= ".php";
+        }
+        $filename = basename($file);
+        $className = $this->getClassNameFromFileName($filename);
+        $fullPath = $this->getAppNamespace().$className;
+        $this->files->requireOnce($path);
+
+        $this->runMigrationList($migrations, ['pretend'=>$pretend]);
     }
 }

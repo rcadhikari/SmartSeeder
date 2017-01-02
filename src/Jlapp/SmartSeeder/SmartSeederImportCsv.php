@@ -179,7 +179,8 @@ class SmartSeederImportCsv extends SmartSeeder
 
     private function updateCounters($record)
     {
-        if ($record->exists) {
+        $isExist = isset($record->id) && !empty($record->id) ? true : false;
+        if ($isExist) {
             $this->counters['existing']++;
         } else
         {

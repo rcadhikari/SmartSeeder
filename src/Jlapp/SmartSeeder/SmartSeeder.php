@@ -161,4 +161,6 @@ class SmartSeeder extends Seeder
     {
         return $this->connection;
     }
+
+
 }

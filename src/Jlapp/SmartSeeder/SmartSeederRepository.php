@@ -256,7 +256,13 @@ class SmartSeederRepository implements SmartSeederRepositoryInterface
      */
     public function getConnection()
     {
-        pc($this->connection);
+        if (empty($this->connection)) {
+            $name = 'cli'; // that's the default system connection
+            $name = ( !in_array($name, config('database.connections') ) ) ? $name : config('database.default');
+
+            $this->connection = $name;
+        }
+
         return $this->resolver->connection($this->connection);
     }
 }
