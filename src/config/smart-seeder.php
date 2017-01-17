@@ -22,5 +22,8 @@ return array(
     'clientSeedFileDir' => 'clients/{client}/seeds',
 
     /* For Master Seeder */
-    'masterSeedFileDir' => 'master_database/seeds'
+    'masterSeedFileDir' => 'master_database/seeds',
+
+    /* For Translation Seeder */
+    'translationSeedFileDir' => 'database/seeds/translation'
 );

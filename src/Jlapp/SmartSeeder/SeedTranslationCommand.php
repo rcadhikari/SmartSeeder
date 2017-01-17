@@ -7,7 +7,7 @@ use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Support\Facades\Config;
 use Jlapp\SmartSeeder\SmartSeedMigrator;
 
-class SeedClientCommand extends Command {
+class SeedTranslationCommand extends Command {
 
     use ConfirmableTrait;
     /**
@@ -15,7 +15,7 @@ class SeedClientCommand extends Command {
      *
      * @var string
      */
-    protected $name = 'seed:client:run';
+    protected $name = 'seed:translation:run';
 
     private $migrator;
 
@@ -28,7 +28,7 @@ class SeedClientCommand extends Command {
      *
      * @var string
      */
-    protected $description = 'Seeds the client data files';
+    protected $description = 'Seeds the translation files';
 
     public function __construct(SmartSeedMigrator $migrator) {
         parent::__construct();
@@ -42,6 +42,8 @@ class SeedClientCommand extends Command {
      */
     public function fire()
     {
+        pc('Running the translations for client');
+
         if ( ! $this->confirmToProceed()) return;
 
         $this->prepareDatabase();
@@ -51,27 +53,30 @@ class SeedClientCommand extends Command {
         // a database for real, which is helpful for double checking migrations.
         $pretend = $this->input->getOption('pretend');
 
-        $path = client_path(config('smart-seeder.clientSeedDir'));
-        $file_path= client_path(config('smart-seeder.clientSeedFileDir'));
-        $client = $this->option('client-name');
-        $file_path = str_replace('{client}', $client, $file_path);
+        // Get the seeder class path
+        $path = client_path(config('smart-seeder.translationSeedFileDir'));
+        // Get the seeder data file path
+        $data_path = $path.config('smart-seeder.dataFileDir');
 
+        $client = $this->option('client-name');
         $env = $client;
         $this->migrator->setEnv($env);
-        // Set the Seed Type as 'client';
-        $this->migrator->setSeedType('client');
+
+        // Set the Seed Type;
+        $this->migrator->setSeedType('translation');
 
         $single = $this->option('file');
         $single_class = $this->option('class');
 
         if ($single) {
-            $this->migrator->runSingleFile("$file_path/$single", $pretend);
+            $this->migrator->runSingleFile("$path/$single", $pretend);
         }
         else if ($single_class) {
+            $file_path= client_path(config('smart-seeder.translationSeedFileDir'));
             $this->migrator->runSingleClass($file_path, $single_class, $pretend);
         }
         else {
-            $this->migrator->run($file_path, $pretend);
+            $this->migrator->run($path, $pretend);
         }
 
         // Once the migrator has run we will grab the note output and send it out to
@@ -99,6 +104,7 @@ class SeedClientCommand extends Command {
             $this->call('seed:install', $options);
         }
     }
+
 
     /**
      * Get the console command options.

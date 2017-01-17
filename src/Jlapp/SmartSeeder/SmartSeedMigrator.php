@@ -142,6 +142,35 @@ class SmartSeedMigrator extends Migrator {
         $this->runMigrationList($migrations, $pretend);
     }
 
+    public function runSingleClass($file_path, $single_class, $pretend=false)
+    {
+        $batch = $this->repository->getNextBatchNumber();
+        $this->notes = array();
+
+        $path = $file = $file_path;
+
+        $files = [$file];
+
+        // Once we grab all of the migration files for the path, we will compare them
+        // against the migrations that have already been run for this package then
+        // run each of the outstanding migrations against a database connection.
+        $ran = $this->repository->getRan();
+
+        $migrations = array_diff($files, $ran);
+
+        $filename_ext = pathinfo($path, PATHINFO_EXTENSION);
+
+        if (!$filename_ext) {
+            $path .= ".php";
+        }
+        $filename = basename($file);
+        $className = $this->getClassNameFromFileName($filename);
+        $fullPath = $this->getAppNamespace().$className;
+        $this->files->requireOnce($path);
+
+        $this->runMigrationList($migrations, $pretend);
+    }
+
     public function setCommand(Command $command)
     {
         $this->command = parent::setCommand($this);
@@ -286,14 +315,15 @@ class SmartSeedMigrator extends Migrator {
         else if ($seedType === 'master') {
             $file_path = client_path(config('smart-seeder.masterSeedFileDir'));
         }
+        else if ($seedType === 'translation') {
+            //$file_path = client_path(config('smart-seeder.translationSeedFileDir'));
+            // Return all the translations seeders
+            return $all_seeders;
+        }
         else {
             // Seeding for core;
             $file_path = client_path(config('smart-seeder.coreSeedFileDir'));
         }
-
-        /*pc ($files);
-        pc ($ran_files);
-        pc($file_path);*/
 
         // filter all seeder by their filename only;
         $all_seeders_files = [];
@@ -307,7 +337,6 @@ class SmartSeedMigrator extends Migrator {
                 $all_seeders_files[] = $file;
             }
         }
-
         return $all_seeders_files;
     }
 } 

@@ -133,6 +133,11 @@ class SmartSeederServiceProvider extends ServiceProvider {
             return new SeedMasterCommand($app['seed.smart_migrator']);
         });
 
+        $this->app->bind('seed:translation:run', function($app)
+        {
+            return new SeedTranslationCommand($app['seed.smart_migrator']);
+        });
+
         $this->commands([
             'seed.install',
 
@@ -149,7 +154,9 @@ class SmartSeederServiceProvider extends ServiceProvider {
             'seed:client:rollback',
 
             'seed:master:make',
-            'seed:master:run'
+            'seed:master:run',
+
+            'seed:translation:run'
         ]);
     }
 
@@ -182,7 +189,9 @@ class SmartSeederServiceProvider extends ServiceProvider {
             'seed:client:rollback',
 
             'seed:master:make',
-            'seed:master:run'
+            'seed:master:run',
+
+            'seed:translation:run'
         ];
     }
 
