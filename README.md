@@ -36,6 +36,20 @@ When you install SmartSeeder, various artisan commands are made available to you
 Installation
 ============
 
-- Add require: "jlapp-hatja/smart-seeder": "dev-master" to your composer.json and run an update to bring it in (or run composer require jlapp/smartseeder).
+- Add require: "rcadhikari/smart-seeder": "dev-master", to your composer.json and run an update to bring it in (or run composer require jlapp/smartseeder).
 - Add 'Jlapp\SmartSeeder\SmartSeederServiceProvider' to your providers array in app/config/app.php
 - Run php artisan vendor:publish to push config files to your config folder if you want to override the name of the seeds folder or the name of the table where seeds are stored
+
+- Add the below script on the composer.json
+```
+"repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/rcadhikari/SmartSeeder"
+        }
+    ]
+```
+
+
+
+
